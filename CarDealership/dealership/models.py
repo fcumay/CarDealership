@@ -1,45 +1,86 @@
-from core.models import *
-from dealer.models import Dealer
+from django.db import models
+
+from customer.models import Customer
 from django_countries.fields import CountryField
 
+from dealer.models import Dealer
 
-class Dealership(BaseModel, BaseCharacteristic):
-    id_dealership = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=200)
-    balance = models.IntegerField(default=0)
+
+class DrivetrainChoices(models.TextChoices):
+    FWD = 'FWD', 'FWD'
+    AWD = 'AWD', 'AWD'
+    RWD = 'RWD', 'RWD'
+    WD4 = '4WD', '4WD'
+
+class FuelTypeChoices(models.TextChoices):
+    DIESEL = 'Diesel', 'Diesel'
+    PETROL = 'Petrol', 'Petrol'
+    ELECTRIC = 'Electric', 'Electric'
+    NATURAL = 'Natural', 'Natural'
+    GAS = 'Gas', 'Gas'
+    HYDROGEN = 'Hydrogen', 'Hydrogen'
+    LPG = 'LPG', 'LPG'
+    FLEX_FUEL = 'Flex-fuel', 'Flex-fuel'
+
+class BodyTypeChoices(models.TextChoices):
+    HATCHBACK = 'Hatchback', 'Hatchback'
+    SEDAN = 'Sedan', 'Sedan'
+    SUV = 'SUV', 'SUV'
+    MUV = 'MUV', 'MUV'
+    COUPE = 'Coupe', 'Coupe'
+    CONVERTIBLE = 'Convertible', 'Convertible'
+    PICKUP = 'Pickup', 'Pickup'
+    TRUCK = 'Truck', 'Truck'
+
+class TransmissionChoices(models.TextChoices):
+    AUTOMATIC = 'automatic', 'Automatic'
+    MANUAL = 'manual', 'Manual'
+    CVT = 'CVT', 'CVT'
+
+
+
+class Brand(models.Model):
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+class Dealership(models.Model):
+    is_active = models.BooleanField(default = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    balance = models.PositiveIntegerField(default=0)
     location = CountryField(max_length=15)
     contact_number = models.CharField(max_length=200)
+    discount_program = models.IntegerField()
 
     def __str__(self):
         return self.name
 
 
-class DealershipInventory(BaseModel):
-    id_inv_dealership = models.AutoField(primary_key=True)
-    dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+class Car(models.Model):
+    is_active = models.BooleanField(default = True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    id = models.AutoField(primary_key=True)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    model = models.CharField(max_length=100)
+    drivetrain = models.CharField(max_length=20, choices=DrivetrainChoices.choices, default=DrivetrainChoices.FWD)
+    engine = models.CharField(max_length=20, choices=FuelTypeChoices.choices, default=FuelTypeChoices.PETROL)
+    bodytype = models.CharField(max_length=20, choices=BodyTypeChoices.choices, default=BodyTypeChoices.SEDAN)
+    transmission = models.CharField(max_length=20, choices=TransmissionChoices.choices, default=TransmissionChoices.AUTOMATIC)
+
+    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE, null=True,blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, default=None,blank=True)
+    dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE, null=True, blank=True)
     price = models.PositiveIntegerField()
 
     def __str__(self):
-        return f"{self.dealership.name} - {self.car.name}: {self.quantity}"
+        return self.model
 
-
-class BuyingHistoryDealership(BaseModel):
-    id_history_dealership = models.AutoField(primary_key=True)
-    dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE)
-    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-    price = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f"{self.dealership} bought {self.car} from {self.dealer}"
-
-
-class PromotionDealership(Promotion):
-    id_promo_dealership = models.AutoField(primary_key=True)
-    dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Promotion: {self.name} - Dealership: {self.dealership}"

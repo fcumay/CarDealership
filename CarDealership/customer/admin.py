@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import *
+from .models import Customer, BuyingHistoryCustomer
 
 
 @admin.register(Customer)
-class DealerAdmin(admin.ModelAdmin):
-    list_display = ['name', 'balance', 'location', 'contact_number', 'age', 'is_active', 'created_at',
-                    'updated_at']
+class CustomerAdmin(admin.ModelAdmin):
+    list_display = (
+    'id', 'name', 'balance', 'location', 'contact_number', 'age', 'is_active', 'created_at', 'updated_at')
 
 
 @admin.register(BuyingHistoryCustomer)
 class BuyingHistoryCustomerAdmin(admin.ModelAdmin):
-    list_display = ['customer', 'car', 'dealership', 'price', 'is_active', 'created_at', 'updated_at']
+    list_display = ('id', 'customer', 'dealership', 'car', 'price', 'created_at')

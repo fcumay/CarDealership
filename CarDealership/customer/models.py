@@ -1,10 +1,12 @@
-from core.models import *
-from dealership.models import Dealership
+from django.db import models
 from django_countries.fields import CountryField
 
 
-class Customer(BaseModel):
-    id_customer = models.AutoField(primary_key=True)
+class Customer(models.Model):
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     balance = models.PositiveIntegerField(default=0)  # positive
     location = CountryField()
@@ -15,11 +17,12 @@ class Customer(BaseModel):
         return self.name
 
 
-class BuyingHistoryCustomer(BaseModel):
-    id_history_customer = models.AutoField(primary_key=True)
+class BuyingHistoryCustomer(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE)
-    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    dealership = models.ForeignKey('dealership.Dealership', on_delete=models.CASCADE)
+    car = models.ForeignKey('dealership.Car', on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
 
     def __str__(self):
