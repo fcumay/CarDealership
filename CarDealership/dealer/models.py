@@ -4,10 +4,10 @@ from django_countries.fields import CountryField
 
 
 class Dealer(models.Model):
+    id = models.AutoField(primary_key=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     amount_of_client = models.PositiveIntegerField(default=0)
     location = CountryField()
@@ -19,8 +19,8 @@ class Dealer(models.Model):
 
 
 class BuyingHistoryDealer(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
     id = models.AutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     dealership = models.ForeignKey('dealership.Dealership', on_delete=models.CASCADE)
     dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE)
     car = models.ForeignKey('dealership.Car', on_delete=models.CASCADE)
@@ -31,10 +31,10 @@ class BuyingHistoryDealer(models.Model):
 
 
 class Promotion(models.Model):
+    id = models.AutoField(primary_key=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     date_start = models.DateTimeField()
     date_finish = models.DateTimeField()

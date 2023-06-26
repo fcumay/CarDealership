@@ -12,6 +12,7 @@ class DrivetrainChoices(models.TextChoices):
     RWD = 'RWD', 'RWD'
     WD4 = '4WD', '4WD'
 
+
 class FuelTypeChoices(models.TextChoices):
     DIESEL = 'Diesel', 'Diesel'
     PETROL = 'Petrol', 'Petrol'
@@ -21,6 +22,7 @@ class FuelTypeChoices(models.TextChoices):
     HYDROGEN = 'Hydrogen', 'Hydrogen'
     LPG = 'LPG', 'LPG'
     FLEX_FUEL = 'Flex-fuel', 'Flex-fuel'
+
 
 class BodyTypeChoices(models.TextChoices):
     HATCHBACK = 'Hatchback', 'Hatchback'
@@ -32,27 +34,29 @@ class BodyTypeChoices(models.TextChoices):
     PICKUP = 'Pickup', 'Pickup'
     TRUCK = 'Truck', 'Truck'
 
+
 class TransmissionChoices(models.TextChoices):
     AUTOMATIC = 'automatic', 'Automatic'
     MANUAL = 'manual', 'Manual'
     CVT = 'CVT', 'CVT'
 
 
-
 class Brand(models.Model):
+    id = models.AutoField(primary_key=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
+
 class Dealership(models.Model):
-    is_active = models.BooleanField(default = True)
+    id = models.AutoField(primary_key=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     balance = models.PositiveIntegerField(default=0)
@@ -65,22 +69,22 @@ class Dealership(models.Model):
 
 
 class Car(models.Model):
-    is_active = models.BooleanField(default = True)
+    id = models.AutoField(primary_key=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     model = models.CharField(max_length=100)
     drivetrain = models.CharField(max_length=20, choices=DrivetrainChoices.choices, default=DrivetrainChoices.FWD)
     engine = models.CharField(max_length=20, choices=FuelTypeChoices.choices, default=FuelTypeChoices.PETROL)
     bodytype = models.CharField(max_length=20, choices=BodyTypeChoices.choices, default=BodyTypeChoices.SEDAN)
-    transmission = models.CharField(max_length=20, choices=TransmissionChoices.choices, default=TransmissionChoices.AUTOMATIC)
+    transmission = models.CharField(max_length=20, choices=TransmissionChoices.choices,
+                                    default=TransmissionChoices.AUTOMATIC)
 
-    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE, null=True,blank=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, default=None,blank=True)
+    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE, null=True, blank=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, default=None, blank=True)
     dealership = models.ForeignKey(Dealership, on_delete=models.CASCADE, null=True, blank=True)
     price = models.PositiveIntegerField()
 
     def __str__(self):
         return self.model
-

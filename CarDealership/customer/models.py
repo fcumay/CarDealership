@@ -3,10 +3,10 @@ from django_countries.fields import CountryField
 
 
 class Customer(models.Model):
+    id = models.AutoField(primary_key=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=200)
     balance = models.PositiveIntegerField(default=0)  # positive
     location = CountryField()
@@ -18,8 +18,8 @@ class Customer(models.Model):
 
 
 class BuyingHistoryCustomer(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
     id = models.AutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     dealership = models.ForeignKey('dealership.Dealership', on_delete=models.CASCADE)
     car = models.ForeignKey('dealership.Car', on_delete=models.CASCADE)

@@ -5,8 +5,8 @@ from .models import Dealer, BuyingHistoryDealer, PromotionDealership, PromotionD
 @admin.register(Dealer)
 class DealerAdmin(admin.ModelAdmin):
     list_display = (
-    'id', 'name', 'amount_of_client', 'location', 'contact_number', 'discount_program', 'is_active', 'created_at',
-    'updated_at')
+        'id', 'name', 'amount_of_client', 'location', 'contact_number', 'discount_program', 'is_active', 'created_at',
+        'updated_at')
 
 
 @admin.register(BuyingHistoryDealer)
@@ -17,10 +17,10 @@ class BuyingHistoryDealerAdmin(admin.ModelAdmin):
 @admin.register(PromotionDealership)
 class PromotionDealershipAdmin(admin.ModelAdmin):
     list_display = (
-    'id', 'name', 'dealership', 'car', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
+        'id', 'name', 'dealership', 'car', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
 
 
 @admin.register(PromotionDealer)
 class PromotionDealerAdmin(admin.ModelAdmin):
     list_display = (
-    'id', 'name', 'dealer', 'car', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
+        'id', 'name', 'dealer', 'car', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
