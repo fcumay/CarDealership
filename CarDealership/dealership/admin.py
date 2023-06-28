@@ -17,7 +17,7 @@ class DealershipAdmin(admin.ModelAdmin):
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'model', 'customer', 'dealership',
+        'id', 'name','model', 'customer', 'dealership',
         'price', 'is_active', 'created_at', 'updated_at')
 
 

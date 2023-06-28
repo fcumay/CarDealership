@@ -48,7 +48,7 @@ class Promotion(models.Model):
 class PromotionDealership(Promotion):
     id = models.AutoField(primary_key=True)
     dealership = models.ForeignKey('dealership.Dealership', on_delete=models.CASCADE)
-    car = models.ForeignKey('dealership.Car', on_delete=models.CASCADE)
+    model = models.ForeignKey('dealership.Model', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Promotion: {self.name} - Dealership: {self.dealership}"
