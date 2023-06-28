@@ -90,6 +90,7 @@ class Model(models.Model):
 
 class Car(models.Model):
     id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -99,4 +100,4 @@ class Car(models.Model):
     price = models.PositiveIntegerField()
 
     def __str__(self):
-        return self.id
+        return self.name
