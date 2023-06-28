@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Brand, Dealership, Car
+from .models import Brand, Dealership, Car, Model
 
 
 @admin.register(Brand)
@@ -10,12 +10,19 @@ class BrandAdmin(admin.ModelAdmin):
 @admin.register(Dealership)
 class DealershipAdmin(admin.ModelAdmin):
     list_display = (
-    'id', 'name', 'brand', 'balance', 'location', 'contact_number', 'discount_program', 'is_active', 'created_at',
-    'updated_at')
+        'id', 'name', 'brand', 'balance', 'location', 'contact_number', 'discount_program', 'is_active', 'created_at',
+        'updated_at')
 
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = (
-    'id', 'brand', 'model', 'drivetrain', 'engine', 'bodytype', 'transmission', 'dealer', 'customer', 'dealership',
-    'price', 'is_active', 'created_at', 'updated_at')
+        'id', 'model', 'customer', 'dealership',
+        'price', 'is_active', 'created_at', 'updated_at')
+
+
+@admin.register(Model)
+class ModelAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'brand', 'name', 'drivetrain', 'engine', 'bodytype', 'transmission', 'dealer', 'price', 'is_active',
+        'created_at', 'updated_at')

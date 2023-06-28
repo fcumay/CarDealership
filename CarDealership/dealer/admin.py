@@ -23,4 +23,4 @@ class PromotionDealershipAdmin(admin.ModelAdmin):
 @admin.register(PromotionDealer)
 class PromotionDealerAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'name', 'dealer', 'car', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
+        'id', 'name', 'dealer', 'model', 'date_start', 'date_finish', 'description', 'percentage', 'created_at')
