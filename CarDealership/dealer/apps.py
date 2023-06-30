@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class DealerConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'dealer'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "dealer"

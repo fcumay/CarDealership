@@ -9,6 +9,7 @@ django-countries = "*"
 python-dotenv = "*"
 flake8 = "*"
 mypy = "*"
+djangorestframework = "*"
 
 [dev-packages]
 
