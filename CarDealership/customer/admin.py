@@ -1,15 +1,12 @@
 from django.contrib import admin
-from .models import Customer, BuyingHistoryCustomer, User
+from .models import Customer, BuyingHistoryCustomer
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
-    list_display = ("email", "name")
 
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("user", "balance", "location", "contact_number", "age")
+    list_display = ("email","name", "balance", "location", "contact_number", "age")
 
 
 @admin.register(BuyingHistoryCustomer)
