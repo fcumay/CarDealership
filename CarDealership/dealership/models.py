@@ -90,8 +90,6 @@ class Model(models.Model):
         default=TransmissionChoices.AUTOMATIC,
     )
 
-    dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE)
-    price = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
