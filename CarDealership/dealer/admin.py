@@ -1,5 +1,11 @@
 from django.contrib import admin
-from .models import Dealer, BuyingHistoryDealer, PromotionDealership, PromotionDealer
+from .models import (
+    Dealer,
+    BuyingHistoryDealer,
+    PromotionDealership,
+    PromotionDealer,
+    DealerInventory,
+)
 
 
 @admin.register(Dealer)
@@ -14,6 +20,16 @@ class DealerAdmin(admin.ModelAdmin):
         "is_active",
         "created_at",
         "updated_at",
+    )
+
+
+@admin.register(DealerInventory)
+class DealerInventoryAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "dealer",
+        "model",
+        "price",
     )
 
 

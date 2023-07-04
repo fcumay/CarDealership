@@ -17,6 +17,11 @@ class Dealer(models.Model):
     def __str__(self):
         return self.name
 
+class DealerInventory(models.Model):
+    id = models.AutoField(primary_key=True)
+    dealer = models.ForeignKey("dealer.Dealer", on_delete=models.CASCADE)
+    model = models.ForeignKey("dealership.Model", on_delete=models.CASCADE)
+    price = models.PositiveIntegerField()
 
 class BuyingHistoryDealer(models.Model):
     id = models.AutoField(primary_key=True)

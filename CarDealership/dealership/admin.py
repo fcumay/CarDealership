@@ -48,8 +48,6 @@ class ModelAdmin(admin.ModelAdmin):
         "engine",
         "bodytype",
         "transmission",
-        "dealer",
-        "price",
         "is_active",
         "created_at",
         "updated_at",
