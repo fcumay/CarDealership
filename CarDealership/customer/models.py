@@ -7,37 +7,10 @@ from django.db import models
 from django_countries.fields import CountryField
 
 
-class UserAccountManager(BaseUserManager):
-    def create_customer(
-        self, email, name, balance, location, contact_number, age, password=None
-    ):
-        user = self.model(
-            email=email, name=name, is_active=True, is_staff=False, is_superuser=False
-        )
-        user.set_password(password)
-        user.save()
-
-        customer = Customer.objects.create(
-            user=user,
-            balance=balance,
-            location=location,
-            contact_number=contact_number,
-            age=age,
-        )
-        return customer
-
-    def create_dealership_admin(self, email, name, password=None):
-        user = self.model(email=email, name=name, is_dealership_admin=True)
-        user.set_password(password)
-        user.save()
-        return user
-
-    def create_superuser(self, email, name, password=None):
-        user = self.model(email=email, name=name, is_superuser=True, is_staff=True)
-        user.set_password(password)
-        user.age = None  # Установка значения None для поля "age"
-        user.save()
-        return user
+class RoleChoices(models.TextChoices):
+    is_customer = "customer", "customer"
+    is_dealership_admin = "dealership_admin", "dealership_admin"
+    is_superuser = "superuser", "superuser"
 
 
 class UserAccountManager(BaseUserManager):
@@ -51,9 +24,7 @@ class UserAccountManager(BaseUserManager):
         age=None,
         password=None,
     ):
-        user = self.model(
-            email=email, name=name, is_active=True, is_staff=False, is_superuser=False
-        )
+        user = self.model(email=email, name=name, is_active=True)
         user.set_password(password)
         user.save()
 
@@ -67,15 +38,16 @@ class UserAccountManager(BaseUserManager):
         return customer
 
     def create_dealership_admin(self, email, name, password=None):
-        user = self.model(email=email, name=name, is_dealership_admin=True)
+        user = self.model(email=email, name=name, rol=RoleChoices.is_dealership_admin)
         user.set_password(password)
         user.save()
         return user
 
     def create_superuser(self, email, name, password=None):
-        user = self.model(email=email, name=name, is_superuser=True, is_staff=True)
+        user = self.model(email=email, name=name, role=RoleChoices.is_superuser)
         user.set_password(password)
-        user.age = None  # Установка значения None для поля "age"
+        user.is_staff = True
+        user.is_superuser = True
         user.save()
         return user
 
@@ -85,17 +57,15 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
+    role = models.CharField(
+        max_length=20, choices=RoleChoices.choices, default=RoleChoices.is_customer
+    )
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    is_dealership_admin = models.BooleanField(default=False)
-    balance = models.PositiveIntegerField(
-        default=0, null=True, blank=True
-    )  # Добавлено null=True и blank=True
-    location = CountryField(null=True, blank=True)  # Добавлено null=True и blank=True
-    contact_number = models.CharField(
-        max_length=20, null=True, blank=True
-    )  # Добавлено null=True и blank=True
-    age = models.IntegerField(null=True, blank=True)  # Добавлено null=True и blank=True
+    balance = models.PositiveIntegerField(default=0, null=True, blank=True)
+    location = CountryField(null=True, blank=True)
+    contact_number = models.CharField(max_length=20, null=True, blank=True)
+    age = models.IntegerField(null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
