@@ -5,6 +5,12 @@ name = "pypi"
 
 [packages]
 django = "*"
+django-countries = "*"
+python-dotenv = "*"
+flake8 = "*"
+mypy = "*"
+djangorestframework = "*"
+autopep8 = "*"
 
 [dev-packages]
 
