@@ -6,84 +6,133 @@ import django_countries.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('dealership', '0001_initial'),
+        ("dealership", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Dealer',
+            name="Dealer",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=200)),
-                ('amount_of_client', models.PositiveIntegerField(default=0)),
-                ('location', django_countries.fields.CountryField(max_length=2)),
-                ('contact_number', models.CharField(max_length=13)),
-                ('discount_program', models.IntegerField()),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=200)),
+                ("amount_of_client", models.PositiveIntegerField(default=0)),
+                ("location", django_countries.fields.CountryField(max_length=2)),
+                ("contact_number", models.CharField(max_length=13)),
+                ("discount_program", models.IntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='PromotionDealership',
+            name="PromotionDealership",
             fields=[
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=200)),
-                ('date_start', models.DateTimeField()),
-                ('date_finish', models.DateTimeField()),
-                ('description', models.CharField(max_length=500)),
-                ('percentage', models.IntegerField(default=0)),
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('dealership', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.dealership')),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.model')),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=200)),
+                ("date_start", models.DateTimeField()),
+                ("date_finish", models.DateTimeField()),
+                ("description", models.CharField(max_length=500)),
+                ("percentage", models.IntegerField(default=0)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                (
+                    "dealership",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.dealership",
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.model",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='PromotionDealer',
+            name="PromotionDealer",
             fields=[
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=200)),
-                ('date_start', models.DateTimeField()),
-                ('date_finish', models.DateTimeField()),
-                ('description', models.CharField(max_length=500)),
-                ('percentage', models.IntegerField(default=0)),
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('dealer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealer.dealer')),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.model')),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=200)),
+                ("date_start", models.DateTimeField()),
+                ("date_finish", models.DateTimeField()),
+                ("description", models.CharField(max_length=500)),
+                ("percentage", models.IntegerField(default=0)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                (
+                    "dealer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dealer.dealer"
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.model",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='DealerInventory',
+            name="DealerInventory",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('price', models.PositiveIntegerField()),
-                ('dealer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealer.dealer')),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.model')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("price", models.PositiveIntegerField()),
+                (
+                    "dealer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dealer.dealer"
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.model",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='BuyingHistoryDealer',
+            name="BuyingHistoryDealer",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('price', models.PositiveIntegerField()),
-                ('car', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.car')),
-                ('dealer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealer.dealer')),
-                ('dealership', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.dealership')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("price", models.PositiveIntegerField()),
+                (
+                    "car",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dealership.car"
+                    ),
+                ),
+                (
+                    "dealer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dealer.dealer"
+                    ),
+                ),
+                (
+                    "dealership",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.dealership",
+                    ),
+                ),
             ],
         ),
     ]

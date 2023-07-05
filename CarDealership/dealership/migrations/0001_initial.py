@@ -7,7 +7,6 @@ import django_countries.fields
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -16,57 +15,147 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Brand',
+            name="Brand",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
             ],
         ),
         migrations.CreateModel(
-            name='Model',
+            name="Model",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('drivetrain', models.CharField(choices=[('FWD', 'FWD'), ('AWD', 'AWD'), ('RWD', 'RWD'), ('4WD', '4WD')], default='FWD', max_length=20)),
-                ('engine', models.CharField(choices=[('Diesel', 'Diesel'), ('Petrol', 'Petrol'), ('Electric', 'Electric'), ('Natural', 'Natural'), ('Gas', 'Gas'), ('Hydrogen', 'Hydrogen'), ('LPG', 'LPG'), ('Flex-fuel', 'Flex-fuel')], default='Petrol', max_length=20)),
-                ('bodytype', models.CharField(choices=[('Hatchback', 'Hatchback'), ('Sedan', 'Sedan'), ('SUV', 'SUV'), ('MUV', 'MUV'), ('Coupe', 'Coupe'), ('Convertible', 'Convertible'), ('Pickup', 'Pickup'), ('Truck', 'Truck')], default='Sedan', max_length=20)),
-                ('transmission', models.CharField(choices=[('automatic', 'Automatic'), ('manual', 'Manual'), ('CVT', 'CVT')], default='automatic', max_length=20)),
-                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.brand')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "drivetrain",
+                    models.CharField(
+                        choices=[
+                            ("FWD", "FWD"),
+                            ("AWD", "AWD"),
+                            ("RWD", "RWD"),
+                            ("4WD", "4WD"),
+                        ],
+                        default="FWD",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "engine",
+                    models.CharField(
+                        choices=[
+                            ("Diesel", "Diesel"),
+                            ("Petrol", "Petrol"),
+                            ("Electric", "Electric"),
+                            ("Natural", "Natural"),
+                            ("Gas", "Gas"),
+                            ("Hydrogen", "Hydrogen"),
+                            ("LPG", "LPG"),
+                            ("Flex-fuel", "Flex-fuel"),
+                        ],
+                        default="Petrol",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "bodytype",
+                    models.CharField(
+                        choices=[
+                            ("Hatchback", "Hatchback"),
+                            ("Sedan", "Sedan"),
+                            ("SUV", "SUV"),
+                            ("MUV", "MUV"),
+                            ("Coupe", "Coupe"),
+                            ("Convertible", "Convertible"),
+                            ("Pickup", "Pickup"),
+                            ("Truck", "Truck"),
+                        ],
+                        default="Sedan",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "transmission",
+                    models.CharField(
+                        choices=[
+                            ("automatic", "Automatic"),
+                            ("manual", "Manual"),
+                            ("CVT", "CVT"),
+                        ],
+                        default="automatic",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "brand",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.brand",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Dealership',
+            name="Dealership",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100)),
-                ('balance', models.PositiveIntegerField(default=0)),
-                ('location', django_countries.fields.CountryField(max_length=15)),
-                ('contact_number', models.CharField(max_length=200)),
-                ('discount_program', models.IntegerField()),
-                ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.brand')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100)),
+                ("balance", models.PositiveIntegerField(default=0)),
+                ("location", django_countries.fields.CountryField(max_length=15)),
+                ("contact_number", models.CharField(max_length=200)),
+                ("discount_program", models.IntegerField()),
+                (
+                    "brand",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.brand",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Car',
+            name="Car",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=100)),
-                ('is_active', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('price', models.PositiveIntegerField()),
-                ('customer', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('dealership', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dealership.dealership')),
-                ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dealership.model')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("name", models.CharField(max_length=100)),
+                ("is_active", models.BooleanField(default=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("price", models.PositiveIntegerField()),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "dealership",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.dealership",
+                    ),
+                ),
+                (
+                    "model",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dealership.model",
+                    ),
+                ),
             ],
         ),
     ]

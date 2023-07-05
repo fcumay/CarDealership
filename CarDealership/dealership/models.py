@@ -3,8 +3,6 @@ from django.db import models
 from customer.models import Customer
 from django_countries.fields import CountryField
 
-from dealer.models import Dealer
-
 
 class DrivetrainChoices(models.TextChoices):
     FWD = "FWD", "FWD"
@@ -76,20 +74,23 @@ class Model(models.Model):
     name = models.CharField(max_length=100)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     drivetrain = models.CharField(
-        max_length=20, choices=DrivetrainChoices.choices, default=DrivetrainChoices.FWD
+        max_length=20,
+        choices=DrivetrainChoices.choices,
+        default=DrivetrainChoices.FWD
     )
     engine = models.CharField(
-        max_length=20, choices=FuelTypeChoices.choices, default=FuelTypeChoices.PETROL
+        max_length=20, choices=FuelTypeChoices.choices,
+        default=FuelTypeChoices.PETROL
     )
     bodytype = models.CharField(
-        max_length=20, choices=BodyTypeChoices.choices, default=BodyTypeChoices.SEDAN
+        max_length=20, choices=BodyTypeChoices.choices,
+        default=BodyTypeChoices.SEDAN
     )
     transmission = models.CharField(
         max_length=20,
         choices=TransmissionChoices.choices,
         default=TransmissionChoices.AUTOMATIC,
     )
-
 
     def __str__(self):
         return self.name
