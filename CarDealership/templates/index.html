@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <div class="content">
+      <div class="container">
+        <h1>Welcome</h1>
+        <label>Log in if you have already registered!</label>
+        <div class="form-group">
+          <button class="btn btn-primary btn-block"><a href="{% url 'login_view' %}">Login</a></button>
+        </div>
+        <label>If not, register here!</label>
+        <div class="form-group">
+          <button class="btn btn-primary btn-block"><a href="{% url 'register_customer' %}">Register</a></button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
