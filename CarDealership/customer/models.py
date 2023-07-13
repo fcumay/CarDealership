@@ -15,38 +15,42 @@ class RoleChoices(models.TextChoices):
 
 class UserAccountManager(BaseUserManager):
     def create_customer(
-            self,
-            email,
-            name,
-            balance=None,
-            location=None,
-            contact_number=None,
-            age=None,
-            password=None,
+        self,
+        email,
+        name,
+        balance=None,
+        location=None,
+        contact_number=None,
+        age=None,
+        password=None,
     ):
-        user = self.model(email=email, name=name, is_active=True)
-        user.set_password(password)
-        user.save()
-
-        customer = Customer.objects.create(
-            user=user,
-            balance=balance,
+        user = self.model(
+            email=email,
+            name=name,
+            is_active=True,
+            balance=15,
             location=location,
             contact_number=contact_number,
             age=age,
         )
-        return customer
+        user.set_password(password)
+        user.save()
+        return user
 
     def create_dealership_admin(self, email, name, password=None):
-        user = self.model(email=email, name=name,
-                          rol=RoleChoices.is_dealership_admin)
+        user = self.model(
+            email=email,
+            name=name,
+            role=RoleChoices.is_dealership_admin)
         user.set_password(password)
         user.save()
         return user
 
     def create_superuser(self, email, name, password=None):
-        user = self.model(email=email, name=name,
-                          role=RoleChoices.is_superuser)
+        user = self.model(
+            email=email,
+            name=name,
+            role=RoleChoices.is_superuser)
         user.set_password(password)
         user.is_staff = True
         user.is_superuser = True
@@ -85,7 +89,8 @@ class BuyingHistoryCustomer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     dealership = models.ForeignKey(
-        "dealership.Dealership", on_delete=models.CASCADE)
+        "dealership.Dealership",
+        on_delete=models.CASCADE)
     car = models.ForeignKey("dealership.Car", on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
 
