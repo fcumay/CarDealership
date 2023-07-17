@@ -11,9 +11,10 @@ class CustomerAdmin(admin.ModelAdmin):
         "balance",
         "location",
         "contact_number",
-        "age",
+        "dob",
     )
-
+    def get_location_display(self, obj):
+        return str(obj.location)
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             password = form.cleaned_data.get("password")
@@ -23,10 +24,4 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(BuyingHistoryCustomer)
 class BuyingHistoryCustomerAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "customer",
-        "dealership",
-        "car",
-        "price",
-        "created_at")
+    list_display = ("id", "customer", "dealership", "car", "price", "created_at")

@@ -8,7 +8,7 @@ class Dealer(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     amount_of_client = models.PositiveIntegerField(default=0)
     location = CountryField()
     contact_number = models.CharField(max_length=13)
@@ -16,6 +16,8 @@ class Dealer(models.Model):
 
     def __str__(self):
         return self.name
+    def get_location_display(self):
+        return str(self.location)
 
 
 class DealerInventory(models.Model):
@@ -43,8 +45,8 @@ class Promotion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200)
-    date_start = models.DateTimeField()
-    date_finish = models.DateTimeField()
+    date_start = models.DateField(max_length=8)
+    date_finish = models.DateField(max_length=8)
     description = models.CharField(max_length=500)
     percentage = models.IntegerField(default=0)
 

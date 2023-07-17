@@ -11,16 +11,20 @@ class BrandAdmin(admin.ModelAdmin):
 class DealershipAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "owner",
         "name",
         "brand",
         "balance",
-        "location",
+        "get_location_display",
         "contact_number",
         "discount_program",
         "is_active",
         "created_at",
         "updated_at",
     )
+
+    def get_location_display(self, obj):
+        return str(obj.location)
 
 
 @admin.register(Car)

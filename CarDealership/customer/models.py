@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django_countries.fields import CountryField
-
+import datetime
 
 class RoleChoices(models.TextChoices):
     is_customer = "customer", "customer"
@@ -21,7 +21,7 @@ class UserAccountManager(BaseUserManager):
         balance=None,
         location=None,
         contact_number=None,
-        age=None,
+        dob=None,
         password=None,
     ):
         user = self.model(
@@ -31,31 +31,26 @@ class UserAccountManager(BaseUserManager):
             balance=15,
             location=location,
             contact_number=contact_number,
-            age=age,
+            dob=dob,
         )
         user.set_password(password)
         user.save()
         return user
 
     def create_dealership_admin(self, email, name, password=None):
-        user = self.model(
-            email=email,
-            name=name,
-            role=RoleChoices.is_dealership_admin)
+        user = self.model(email=email, name=name, role=RoleChoices.is_dealership_admin)
         user.set_password(password)
         user.save()
         return user
 
     def create_superuser(self, email, name, password=None):
-        user = self.model(
-            email=email,
-            name=name,
-            role=RoleChoices.is_superuser)
+        user = self.model(email=email, name=name, role=RoleChoices.is_superuser)
         user.set_password(password)
         user.is_staff = True
         user.is_superuser = True
         user.save()
         return user
+
 
 
 class Customer(AbstractBaseUser, PermissionsMixin):
@@ -71,15 +66,13 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
-    location = CountryField(null=True, blank=True)
+    location = CountryField(max_length=15,null=True, blank=True)
     contact_number = models.CharField(max_length=20, null=True, blank=True)
-    age = models.IntegerField(null=True, blank=True)
-
+    dob = models.DateField(max_length=8,null=True, blank=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 
     objects = UserAccountManager()
-
     def __str__(self):
         return self.name
 
@@ -88,9 +81,7 @@ class BuyingHistoryCustomer(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    dealership = models.ForeignKey(
-        "dealership.Dealership",
-        on_delete=models.CASCADE)
+    dealership = models.ForeignKey("dealership.Dealership", on_delete=models.CASCADE)
     car = models.ForeignKey("dealership.Car", on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
 

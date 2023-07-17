@@ -1,10 +1,14 @@
-from .models import RoleChoices
+from django_countries import countries
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+from .models import RoleChoices, Customer, BuyingHistoryCustomer
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, BuyingHistoryCustomerSerializer
 
 User = get_user_model()
 
@@ -25,8 +29,7 @@ class RegisterViewAPI(APIView):
 
             if role not in RoleChoices.values:
                 return Response(
-                    {"error": "Invalid role"},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Invalid role"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
             if password == re_password:
@@ -38,8 +41,10 @@ class RegisterViewAPI(APIView):
                                     email=email, name=name, password=password
                                 )
                                 return Response(
-                                    {"success": "Dealership admin created successfully"},
-                                    status=status.HTTP_201_CREATED
+                                    {
+                                        "success": "Dealership admin created successfully"
+                                    },
+                                    status=status.HTTP_201_CREATED,
                                 )
                             else:
                                 return Response(
@@ -56,7 +61,7 @@ class RegisterViewAPI(APIView):
                                 balance=None,
                                 location=None,
                                 contact_number=None,
-                                age=None,
+                                dob=None,
                             )
                             return Response(
                                 {"success": "User created successfully"},
@@ -86,6 +91,9 @@ class RegisterViewAPI(APIView):
 
 
 class RetrieveUserView(APIView):
+    permission_classes = [
+        IsAuthenticated,
+    ]
     def get(self, request, format=None):
         try:
             user = request.user
@@ -97,3 +105,34 @@ class RetrieveUserView(APIView):
                 {"error": "Something went wrong when retrieving user details"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+
+    def put(self, request):
+
+        try:
+            data = request.data
+            for code, name in countries:
+                if name == data["location"]:
+                    location = code
+                    break
+            Customer.objects.filter(email=request.user.email).update(
+                name=data["name"],
+                location=location,
+                contact_number=data["contact_number"],
+                dob = data["dob"]
+            )
+            return Response(
+                {"success": "User update successfully"}, status=status.HTTP_200_OK
+            )
+        except:
+            return Response(
+                {"error": "Something went wrong when updating user information"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class BuyingHistoryCustomerView(APIView):
+    def get(self, request, format=None):
+        history = BuyingHistoryCustomer.objects.filter(customer=request.user)
+        history = BuyingHistoryCustomerSerializer(history, many=True)
+        return Response({"History": history.data}, status=status.HTTP_200_OK)
+
