@@ -66,9 +66,6 @@ class Dealership(models.Model):
     def __str__(self):
         return self.name
 
-    def get_location_display(self):
-        return str(self.location)
-
 
 class Model(models.Model):
     id = models.AutoField(primary_key=True)

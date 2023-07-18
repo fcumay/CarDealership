@@ -9,18 +9,14 @@ class CanModifyDealership(permissions.BasePermission):
             RoleChoices.is_superuser,
             RoleChoices.is_dealership_admin,
         ]
-
     def has_object_permission(self, request, view, obj):
         if request.user.role == RoleChoices.is_superuser:
             return True
         elif request.user.role == RoleChoices.is_dealership_admin:
+            if request.method == 'PUT':
+                if 'balance' in request.data or 'owner' in request.data:
+                    return False
             return request.user.email == obj.owner.email
         return False
 
 
-class IsAdminOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-
-        return bool(request.user and request.user.is_staff)
