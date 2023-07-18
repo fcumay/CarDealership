@@ -48,11 +48,6 @@ class ManageDealershipView(
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
-
-        if not request.user.is_superuser and ('balance' in request.data or 'owner' in request.data):
-            return Response({'detail': 'You are not allowed to modify balance or owner.'},
-                            status=status.HTTP_403_FORBIDDEN)
-
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -64,5 +59,3 @@ class ManageDealershipView(
         instance.is_active = False
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
