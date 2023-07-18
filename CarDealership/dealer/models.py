@@ -16,6 +16,7 @@ class Dealer(models.Model):
 
     def __str__(self):
         return self.name
+
     def get_location_display(self):
         return str(self.location)
 
@@ -30,7 +31,9 @@ class DealerInventory(models.Model):
 class BuyingHistoryDealer(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    dealership = models.ForeignKey("dealership.Dealership", on_delete=models.CASCADE)
+    dealership = models.ForeignKey(
+        "dealership.Dealership",
+        on_delete=models.CASCADE)
     dealer = models.ForeignKey(Dealer, on_delete=models.CASCADE)
     car = models.ForeignKey("dealership.Car", on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
@@ -56,7 +59,9 @@ class Promotion(models.Model):
 
 class PromotionDealership(Promotion):
     id = models.AutoField(primary_key=True)
-    dealership = models.ForeignKey("dealership.Dealership", on_delete=models.CASCADE)
+    dealership = models.ForeignKey(
+        "dealership.Dealership",
+        on_delete=models.CASCADE)
     model = models.ForeignKey("dealership.Model", on_delete=models.CASCADE)
 
     def __str__(self):

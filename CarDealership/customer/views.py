@@ -19,7 +19,6 @@ class RegisterViewAPI(APIView):
     def post(self, request):
         try:
             data = request.data
-
             name = data["name"]
             email = data["email"]
             email = email.lower()
@@ -94,6 +93,7 @@ class RetrieveUserView(APIView):
     permission_classes = [
         IsAuthenticated,
     ]
+
     def get(self, request, format=None):
         try:
             user = request.user
@@ -107,7 +107,6 @@ class RetrieveUserView(APIView):
             )
 
     def put(self, request):
-
         try:
             data = request.data
             for code, name in countries:
@@ -118,7 +117,7 @@ class RetrieveUserView(APIView):
                 name=data["name"],
                 location=location,
                 contact_number=data["contact_number"],
-                dob = data["dob"]
+                dob=data["dob"],
             )
             return Response(
                 {"success": "User update successfully"}, status=status.HTTP_200_OK
@@ -135,4 +134,3 @@ class BuyingHistoryCustomerView(APIView):
         history = BuyingHistoryCustomer.objects.filter(customer=request.user)
         history = BuyingHistoryCustomerSerializer(history, many=True)
         return Response({"History": history.data}, status=status.HTTP_200_OK)
-

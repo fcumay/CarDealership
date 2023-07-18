@@ -13,8 +13,10 @@ class CustomerAdmin(admin.ModelAdmin):
         "contact_number",
         "dob",
     )
+
     def get_location_display(self, obj):
         return str(obj.location)
+
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             password = form.cleaned_data.get("password")

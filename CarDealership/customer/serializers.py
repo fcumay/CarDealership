@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django_countries.serializers import CountryFieldMixin
-from customer.models import Customer,BuyingHistoryCustomer
+from customer.models import Customer, BuyingHistoryCustomer
 
 User = get_user_model()
 
@@ -15,7 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
             "role",
         )
 
-class CustomerSerializer(CountryFieldMixin,serializers.ModelSerializer):
+
+class CustomerSerializer(CountryFieldMixin, serializers.ModelSerializer):
     location = serializers.CharField(source="get_location_display")
 
     class Meta:
@@ -26,4 +27,4 @@ class CustomerSerializer(CountryFieldMixin,serializers.ModelSerializer):
 class BuyingHistoryCustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = BuyingHistoryCustomer
-        fields =('__all__')
+        fields = "__all__"

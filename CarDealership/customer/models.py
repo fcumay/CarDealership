@@ -7,6 +7,7 @@ from django.db import models
 from django_countries.fields import CountryField
 import datetime
 
+
 class RoleChoices(models.TextChoices):
     is_customer = "customer", "customer"
     is_dealership_admin = "dealership_admin", "dealership_admin"
@@ -52,7 +53,6 @@ class UserAccountManager(BaseUserManager):
         return user
 
 
-
 class Customer(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
@@ -66,13 +66,14 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
-    location = CountryField(max_length=15,null=True, blank=True)
+    location = CountryField(max_length=15, null=True, blank=True)
     contact_number = models.CharField(max_length=20, null=True, blank=True)
-    dob = models.DateField(max_length=8,null=True, blank=True)
+    dob = models.DateField(max_length=8, null=True, blank=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 
     objects = UserAccountManager()
+
     def __str__(self):
         return self.name
 
