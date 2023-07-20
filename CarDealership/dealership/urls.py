@@ -1,12 +1,11 @@
-from django.urls import path
-from .views import (
-    ManageDealershipView,
-)
+from django.urls import path, include
+from .views import DealershipViewSet
+
+from rest_framework import routers
+
+router = routers.DefaultRouter()
+router.register(r'dealership', DealershipViewSet,basename='dealership')
 
 urlpatterns = [
-    path("dealership/manage/", ManageDealershipView.as_view()),
-    path("dealership/manage/<str:name>/", ManageDealershipView.as_view()),
-    # path("brand/manage/", ManageBrandView.as_view()),
-    # path("model/manage/", ManageModelView.as_view()),
-    # path("car/manage/", ManageCarView.as_view()),
+    path('', include(router.urls)),
 ]

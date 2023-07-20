@@ -12,6 +12,7 @@ mypy = "*"
 djangorestframework = "*"
 autopep8 = "*"
 djangorestframework-simplejwt = "*"
+django-filter = "*"
 
 [dev-packages]
 

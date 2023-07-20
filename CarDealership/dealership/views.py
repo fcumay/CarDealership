@@ -1,61 +1,21 @@
-from rest_framework.response import Response
+from rest_framework import viewsets
+from .filters import DealershipFilter
 from .models import (
     Dealership,
 )
 from .serializers import (
     DealershipSerializer,
 )
-from rest_framework import status
-from rest_framework.permissions import IsAdminUser
 from .permissions import CanModifyDealership
-from rest_framework import mixins, generics
+from django_filters.rest_framework import DjangoFilterBackend
 
-
-class ManageDealershipView(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    generics.GenericAPIView
-
-):
+class DealershipViewSet(viewsets.ModelViewSet):
     queryset = Dealership.objects.all()
     serializer_class = DealershipSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class=DealershipFilter
     permission_classes = [CanModifyDealership]
-    lookup_field = 'name'
-
-    def get_permissions(self):
-        if self.request.method == "POST":
-            return [IsAdminUser()]
-        return super().get_permissions()
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        allowed_objects = []
-        for obj in queryset:
-            try:
-                self.check_object_permissions(self.request, obj)
-                allowed_objects.append(obj)
-            except:
-                continue
-        return Dealership.objects.filter(id__in=[obj.id for obj in allowed_objects])
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        return Response(serializer.data)
-
-    def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
+    def perform_destroy(self, instance):
         instance.is_active = False
         instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
