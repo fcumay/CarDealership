@@ -10,19 +10,18 @@ class Dealer(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=200, unique=True)
     amount_of_client = models.PositiveIntegerField(default=0)
-    location = CountryField()
+    location = CountryField(max_length=15)
     contact_number = models.CharField(max_length=13)
     discount_program = models.IntegerField()
 
     def __str__(self):
         return self.name
 
-    def get_location_display(self):
-        return str(self.location)
-
 
 class DealerInventory(models.Model):
     id = models.AutoField(primary_key=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     dealer = models.ForeignKey("dealer.Dealer", on_delete=models.CASCADE)
     model = models.ForeignKey("dealership.Model", on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
