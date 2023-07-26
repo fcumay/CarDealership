@@ -1,136 +1,66 @@
-from django_countries import countries
-from rest_framework.decorators import permission_classes
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 
-from .models import RoleChoices, Customer, BuyingHistoryCustomer
-from rest_framework import permissions, status
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from .filters import UserFilter
+from .models import Customer, BuyingHistoryCustomer
+from rest_framework import status, viewsets
 from django.contrib.auth import get_user_model
-
-from .serializers import UserSerializer, BuyingHistoryCustomerSerializer
+from .permissions import RegistrationPermission, Information
+from .serializers import (
+    UserSerializer,
+    BuyingHistoryCustomerSerializer,
+    InformationSerializer,
+)
 
 User = get_user_model()
 
 
-class RegisterViewAPI(APIView):
-    permission_classes = (permissions.AllowAny,)
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = UserFilter
+    permission_classes = (RegistrationPermission,)
 
-    def post(self, request):
-        try:
-            data = request.data
-            name = data["name"]
-            email = data["email"]
-            email = email.lower()
-            password = data["password"]
-            re_password = data["re_password"]
-            role = data["role"]
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by("-id")
+        return queryset
 
-            if role not in RoleChoices.values:
-                return Response(
-                    {"error": "Invalid role"}, status=status.HTTP_400_BAD_REQUEST
-                )
-
-            if password == re_password:
-                if len(password) >= 8:
-                    if not User.objects.filter(email=email).exists():
-                        if role == RoleChoices.is_dealership_admin:
-                            if request.user.role == RoleChoices.is_superuser:
-                                User.objects.create_dealership_admin(
-                                    email=email, name=name, password=password
-                                )
-                                return Response(
-                                    {
-                                        "success": "Dealership admin created successfully"
-                                    },
-                                    status=status.HTTP_201_CREATED,
-                                )
-                            else:
-                                return Response(
-                                    {
-                                        "error": "Only superuser can create Dealership_admin user"
-                                    },
-                                    status=status.HTTP_403_FORBIDDEN,
-                                )
-                        else:
-                            User.objects.create_customer(
-                                email=email,
-                                name=name,
-                                password=password,
-                                balance=None,
-                                location=None,
-                                contact_number=None,
-                                dob=None,
-                            )
-                            return Response(
-                                {"success": "User created successfully"},
-                                status=status.HTTP_201_CREATED,
-                            )
-                    else:
-                        return Response(
-                            {"error": "User with this email already exists"},
-                            status=status.HTTP_400_BAD_REQUEST,
-                        )
-                else:
-                    return Response(
-                        {"error": "Passwords must be at least 8 characters in length"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-
-            else:
-                return Response(
-                    {"error": "Passwords do not match"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-        except BaseException:
-            return Response(
-                {"error": "Something went wrong when registering an account"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+    def perform_create(self, serializer):
+        if (
+            self.request.data.get("role") == "dealership_admin"
+            and not self.request.user.is_superuser
+        ):
+            raise PermissionDenied(
+                "Only superuser can create dealership_admin user")
+        return super().perform_create(serializer)
 
 
-class RetrieveUserView(APIView):
-    permission_classes = [
-        IsAuthenticated,
-    ]
+class InformationViewSet(viewsets.ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = InformationSerializer
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = (Information,)
 
-    def get(self, request, format=None):
-        try:
-            user = request.user
-            user = UserSerializer(user)
-
-            return Response({"user": user.data}, status=status.HTTP_200_OK)
-        except BaseException:
-            return Response(
-                {"error": "Something went wrong when retrieving user details"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
-
-    def put(self, request):
-        try:
-            data = request.data
-            for code, name in countries:
-                if name == data["location"]:
-                    location = code
-                    break
-            Customer.objects.filter(email=request.user.email).update(
-                name=data["name"],
-                location=location,
-                contact_number=data["contact_number"],
-                dob=data["dob"],
-            )
-            return Response(
-                {"success": "User update successfully"}, status=status.HTTP_200_OK
-            )
-        except:
-            return Response(
-                {"error": "Something went wrong when updating user information"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            )
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by("-id")
+        return queryset
 
 
-class BuyingHistoryCustomerView(APIView):
-    def get(self, request, format=None):
-        history = BuyingHistoryCustomer.objects.filter(customer=request.user)
-        history = BuyingHistoryCustomerSerializer(history, many=True)
-        return Response({"History": history.data}, status=status.HTTP_200_OK)
+class BuyingHistoryCustomerViewSet(viewsets.ModelViewSet):
+    queryset = BuyingHistoryCustomer.objects.all()
+    serializer_class = BuyingHistoryCustomerSerializer
+    filter_backends = (DjangoFilterBackend,)
+    permission_classes = [IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        instance.is_active = False
+        instance.save()
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.filter(customer=self.request.user)
+        return queryset

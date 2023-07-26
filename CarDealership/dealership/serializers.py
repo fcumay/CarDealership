@@ -40,18 +40,20 @@ class DealershipSerializer(serializers.ModelSerializer):
         brand = modified_data.get("brand")
         owner = modified_data.get("owner")
         location = modified_data.get("location")
-        if brand:
-            brand = Brand.objects.get(name=brand)
-            modified_data["brand"] = brand.id
-        if owner:
-            owner = Customer.objects.get(email=owner)
-            modified_data["owner"] = owner.id
-        if location:
-            for code, name in countries:
-                if name == location:
-                    location = code
-            modified_data["location"] = location
-
+        try:
+            if brand:
+                brand = Brand.objects.get(name=brand)
+                modified_data["brand"] = brand.id
+            if owner:
+                owner = Customer.objects.get(email=owner)
+                modified_data["owner"] = owner.id
+            if location:
+                for code, name in countries:
+                    if name == location:
+                        location = code
+                modified_data["location"] = location
+        except BaseException:
+            raise serializers.ValidationError("Input valid data")
         return modified_data
 
 
@@ -98,9 +100,12 @@ class ModelSerializer(serializers.ModelSerializer):
     def modify_data(self, data):
         modified_data = data.copy()
         brand = modified_data.get("brand")
-        if brand:
-            brand = Brand.objects.get(name=brand)
-            modified_data["brand"] = brand.id
+        try:
+            if brand:
+                brand = Brand.objects.get(name=brand)
+                modified_data["brand"] = brand.id
+        except BaseException:
+            raise serializers.ValidationError("Input valid data")
         return modified_data
 
 
@@ -126,13 +131,16 @@ class CarSerializer(serializers.ModelSerializer):
         model = modified_data.get("model")
         customer = modified_data.get("customer")
         dealership = modified_data.get("dealership")
-        if model:
-            model = Model.objects.get(name=model)
-            modified_data["model"] = model.id
-        if customer:
-            customer = Customer.objects.get(email=customer)
-            modified_data["customer"] = customer.id
-        if dealership:
-            dealership = Dealership.objects.get(name=dealership)
-            modified_data["dealership"] = dealership.id
+        try:
+            if model:
+                model = Model.objects.get(name=model)
+                modified_data["model"] = model.id
+            if customer:
+                customer = Customer.objects.get(email=customer)
+                modified_data["customer"] = customer.id
+            if dealership:
+                dealership = Dealership.objects.get(name=dealership)
+                modified_data["dealership"] = dealership.id
+        except BaseException:
+            raise serializers.ValidationError("Input valid data")
         return modified_data
