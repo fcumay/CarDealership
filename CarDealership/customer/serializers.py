@@ -9,10 +9,10 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)  # Поле для ввода пароля
+    password = serializers.CharField(write_only=True)
     re_password = serializers.CharField(
         write_only=True
-    )  # Поле для повторного ввода пароля
+    )
 
     class Meta:
         model = User
@@ -54,6 +54,7 @@ class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = (
+            "id",
             "name",
             "email",
             "balance",
@@ -81,6 +82,10 @@ class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
                     location = code
             modified_data["location"] = location
         return modified_data
+
+    def update(self, instance, validated_data):
+        validated_data.pop('email', self.instance.email)
+        return super().update(instance, validated_data)
 
 
 class BuyingHistoryCustomerSerializer(serializers.ModelSerializer):
