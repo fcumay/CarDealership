@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "dealership",
     "customer",
     "django_filters",
+    "phonenumber_field",
 ]
 
 MIDDLEWARE = [

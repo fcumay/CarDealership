@@ -8,13 +8,7 @@ from dealer.filters import (
     PromotionDealershipFilter,
     PromotionDealerFilter,
 )
-from dealer.models import (
-    Dealer,
-    DealerInventory,
-    BuyingHistoryDealer,
-    PromotionDealership,
-    PromotionDealer,
-)
+from dealer.models import Dealer, DealerInventory, BuyingHistoryDealer, PromotionDealership, PromotionDealer
 
 from dealer.serializers import (
     DealerSerializer,
@@ -24,14 +18,12 @@ from dealer.serializers import (
     PromotionDealerSerializer,
 )
 from dealer.permissions import (
-    IsAdminOrReadOnly,
     CanModifyDealer,
     IsAdminOwnerOrReadlOnly,
 )
 
 
 class DealerViewSet(viewsets.ModelViewSet):
-    queryset = Dealer.objects.all()
     serializer_class = DealerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DealerFilter
@@ -42,14 +34,13 @@ class DealerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
-            queryset = queryset.order_by("-created_at").filter(is_active=True)
+        queryset = Dealer.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
 class DealerInventoryViewSet(viewsets.ModelViewSet):
-    queryset = DealerInventory.objects.all()
     serializer_class = DealerInventorySerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DealerInventoryFilter
@@ -60,14 +51,13 @@ class DealerInventoryViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
-            queryset = queryset.order_by("-created_at").filter(is_active=True)
+        queryset = DealerInventory.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
 class BuyingHistoryDealerViewSet(viewsets.ModelViewSet):
-    queryset = BuyingHistoryDealer.objects.all()
     serializer_class = BuyingHistoryDealerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BuyingHistoryDealerFilter
@@ -78,13 +68,12 @@ class BuyingHistoryDealerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = BuyingHistoryDealer.objects.all()
         queryset = queryset.order_by("-created_at")
         return queryset
 
 
 class PromotionDealershipViewSet(viewsets.ModelViewSet):
-    queryset = PromotionDealership.objects.all()
     serializer_class = PromotionDealershipSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = PromotionDealershipFilter
@@ -95,13 +84,12 @@ class PromotionDealershipViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = PromotionDealership.objects.all()
         queryset = queryset.order_by("-id")
         return queryset
 
 
 class PromotionDealerViewSet(viewsets.ModelViewSet):
-    queryset = PromotionDealer.objects.all()
     serializer_class = PromotionDealerSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = PromotionDealerFilter
@@ -112,6 +100,6 @@ class PromotionDealerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = PromotionDealer.objects.all()
         queryset = queryset.order_by("-id")
         return queryset

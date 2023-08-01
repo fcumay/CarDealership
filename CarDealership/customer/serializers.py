@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django_countries.serializers import CountryFieldMixin
 from customer.models import Customer, BuyingHistoryCustomer
 from rest_framework import serializers
-from dealership.models import Dealership
+from dealership.models import Dealership, Car
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -62,13 +63,6 @@ class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
             "contact_number",
             "dob")
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        request = self.context.get("request", None)
-        if request and not request.user.is_superuser:
-            data.pop("id", None)
-        return data
-
     def to_internal_value(self, data):
         modified_data = self.modify_data(data)
         return super().to_internal_value(modified_data)
@@ -102,16 +96,13 @@ class BuyingHistoryCustomerSerializer(serializers.ModelSerializer):
         customer = modified_data.get("customer")
         dealership = modified_data.get("dealership")
         car = modified_data.get("car")
-        try:
-            if customer:
-                customer = Customer.objects.get(name=customer)
-                modified_data["customer"] = customer.id
-            if dealership:
-                dealership = Dealership.objects.get(name=dealership)
-                modified_data["dealership"] = dealership.id
-            if car:
-                car = Dealership.objects.get(name=car)
-                modified_data["car"] = car.id
-        except BaseException:
-            raise serializers.ValidationError("Input valid data")
+        if customer:
+            customer = get_object_or_404(Customer, name=customer)
+            modified_data["customer"] = customer.id
+        if dealership:
+            dealership = get_object_or_404(Dealership, name=dealership)
+            modified_data["dealership"] = dealership.id
+        if car:
+            car = get_object_or_404(Car, name=car)
+            modified_data["car"] = car.id
         return modified_data

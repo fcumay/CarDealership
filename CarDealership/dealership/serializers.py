@@ -1,9 +1,9 @@
 from django_countries import countries
-
-from customer.models import Customer, RoleChoices
+from customer.models import Customer
 from .models import Brand, Model, Car
 from rest_framework import serializers
 from .models import Dealership
+from django.shortcuts import get_object_or_404
 
 
 class DealershipSerializer(serializers.ModelSerializer):
@@ -24,9 +24,8 @@ class DealershipSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         request = self.context.get("request", None)
         if request and not (
-            request.user.is_superuser or request.user.email == instance.owner.email
+                request.user.is_superuser or request.user.email == instance.owner.email
         ):
-            data.pop("id", None)
             data.pop("balance", None)
             data.pop("owner", None)
         return data
@@ -40,20 +39,17 @@ class DealershipSerializer(serializers.ModelSerializer):
         brand = modified_data.get("brand")
         owner = modified_data.get("owner")
         location = modified_data.get("location")
-        try:
-            if brand:
-                brand = Brand.objects.get(name=brand)
-                modified_data["brand"] = brand.id
-            if owner:
-                owner = Customer.objects.get(email=owner)
-                modified_data["owner"] = owner.id
-            if location:
-                for code, name in countries:
-                    if name == location:
-                        location = code
-                modified_data["location"] = location
-        except BaseException:
-            raise serializers.ValidationError("Input valid data")
+        if brand:
+            brand = get_object_or_404(Brand, name=brand)
+            modified_data["brand"] = brand.id
+        if owner:
+            owner = get_object_or_404(Customer, email=owner)
+            modified_data["owner"] = owner.id
+        if location:
+            for code, name in countries:
+                if name == location:
+                    location = code
+            modified_data["location"] = location
         return modified_data
 
 
@@ -64,13 +60,6 @@ class BrandSerializer(serializers.ModelSerializer):
             "id",
             "name",
         )
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        request = self.context.get("request", None)
-        if request and not request.user.is_superuser:
-            data.pop("id", None)
-        return data
 
 
 class ModelSerializer(serializers.ModelSerializer):
@@ -86,13 +75,6 @@ class ModelSerializer(serializers.ModelSerializer):
             "transmission",
         )
 
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        request = self.context.get("request", None)
-        if request and not request.user.is_superuser:
-            data.pop("id", None)
-        return data
-
     def to_internal_value(self, data):
         modified_data = self.modify_data(data)
         return super().to_internal_value(modified_data)
@@ -100,12 +82,9 @@ class ModelSerializer(serializers.ModelSerializer):
     def modify_data(self, data):
         modified_data = data.copy()
         brand = modified_data.get("brand")
-        try:
-            if brand:
-                brand = Brand.objects.get(name=brand)
-                modified_data["brand"] = brand.id
-        except BaseException:
-            raise serializers.ValidationError("Input valid data")
+        if brand:
+            brand = get_object_or_404(Brand, name=brand)
+            modified_data["brand"] = brand.id
         return modified_data
 
 
@@ -113,14 +92,6 @@ class CarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car
         fields = ("id", "name", "model", "customer", "dealership", "price")
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
-        request = self.context.get("request", None)
-        if request and not request.user.is_superuser:
-            data.pop("id", None)
-            data.pop("customer", None)
-        return data
 
     def to_internal_value(self, data):
         modified_data = self.modify_data(data)
@@ -131,16 +102,29 @@ class CarSerializer(serializers.ModelSerializer):
         model = modified_data.get("model")
         customer = modified_data.get("customer")
         dealership = modified_data.get("dealership")
-        try:
-            if model:
-                model = Model.objects.get(name=model)
-                modified_data["model"] = model.id
-            if customer:
-                customer = Customer.objects.get(email=customer)
-                modified_data["customer"] = customer.id
-            if dealership:
-                dealership = Dealership.objects.get(name=dealership)
-                modified_data["dealership"] = dealership.id
-        except BaseException:
-            raise serializers.ValidationError("Input valid data")
+        if model:
+            model = get_object_or_404(Model, name=model)
+            modified_data["model"] = model.id
+        if customer:
+            customer = get_object_or_404(Customer, email=customer)
+            modified_data["customer"] = customer.id
+        if dealership:
+            dealership = get_object_or_404(Dealership, name=dealership)
+            modified_data["dealership"] = dealership.id
         return modified_data
+
+    def create(self, validated_data):
+        name = validated_data.get('name')
+        model = validated_data.get('model')
+        dealership = validated_data.get('dealership')
+        price = validated_data.get('price')
+        car = Car(name=name, model=model, dealership=dealership, price=price)
+        car.save()
+        return car
+
+    def update(self, instance, validated_data):
+        customer = validated_data.get('customer')
+        instance.customer = customer
+        instance.dealership = None
+        instance.save()
+        return instance

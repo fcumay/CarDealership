@@ -1,11 +1,6 @@
 from rest_framework import viewsets
 from .filters import DealershipFilter, BrandFilter, ModelFilter, CarFilter
-from .models import (
-    Dealership,
-    Brand,
-    Model,
-    Car,
-)
+from .models import Model, Brand, Car, Dealership
 from .serializers import (
     DealershipSerializer,
     BrandSerializer,
@@ -17,7 +12,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 class DealershipViewSet(viewsets.ModelViewSet):
-    queryset = Dealership.objects.all()
     serializer_class = DealershipSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DealershipFilter
@@ -28,14 +22,13 @@ class DealershipViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
-            queryset = queryset.order_by("-created_at").filter(is_active=True)
+        queryset = Dealership.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
 class BrandViewSet(viewsets.ModelViewSet):
-    queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BrandFilter
@@ -46,14 +39,13 @@ class BrandViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
-            queryset = queryset.order_by("-created_at").filter(is_active=True)
+        queryset = Brand.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
 class ModelViewSet(viewsets.ModelViewSet):
-    queryset = Model.objects.all()
     serializer_class = ModelSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter
@@ -64,14 +56,13 @@ class ModelViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
-            queryset = queryset.order_by("-created_at").filter(is_active=True)
+        queryset = Model.objects.all()
+        if not self.request.user.is_superuser:
+            queryset = queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
 class CarViewSet(viewsets.ModelViewSet):
-    queryset = Car.objects.all()
     serializer_class = CarSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = CarFilter
@@ -82,11 +73,10 @@ class CarViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        if not (self.request.user.is_superuser):
+        queryset = Car.objects.all()
+        if not self.request.user.is_superuser:
             queryset = (
-                queryset.order_by("-created_at")
-                .filter(customer=None)
-                .exclude(is_active=False)
+                queryset.filter(customer=None)
+                .exclude(is_active=False).order_by("-created_at")
             )
         return queryset

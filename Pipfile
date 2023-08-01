@@ -13,6 +13,7 @@ djangorestframework = "*"
 autopep8 = "*"
 djangorestframework-simplejwt = "*"
 django-filter = "*"
+django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
 
 [dev-packages]
 

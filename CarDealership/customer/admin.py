@@ -5,6 +5,7 @@ from .models import Customer, BuyingHistoryCustomer
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "email",
         "name",
         "role",
@@ -26,4 +27,10 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(BuyingHistoryCustomer)
 class BuyingHistoryCustomerAdmin(admin.ModelAdmin):
-    list_display = ("id", "customer", "dealership", "car", "price", "created_at")
+    list_display = (
+        "id",
+        "customer",
+        "dealership",
+        "car",
+        "price",
+        "created_at")

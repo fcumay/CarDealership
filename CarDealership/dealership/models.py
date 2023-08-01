@@ -2,6 +2,7 @@ from django.db import models
 
 from customer.models import Customer
 from django_countries.fields import CountryField
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class DrivetrainChoices(models.TextChoices):
@@ -59,7 +60,7 @@ class Dealership(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.RESTRICT)
     balance = models.PositiveIntegerField(default=100)
     location = CountryField(max_length=15)
-    contact_number = models.CharField(max_length=200)
+    contact_number = PhoneNumberField()
     discount_program = models.IntegerField()
     owner = models.ForeignKey(Customer, on_delete=models.RESTRICT)
 
@@ -73,7 +74,7 @@ class Model(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=100, unique=True)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    brand = models.ForeignKey(Brand, on_delete=models.RESTRICT)
     drivetrain = models.CharField(
         max_length=20, choices=DrivetrainChoices.choices, default=DrivetrainChoices.FWD
     )
@@ -99,7 +100,7 @@ class Car(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    model = models.ForeignKey(Model, on_delete=models.CASCADE)
+    model = models.ForeignKey(Model, on_delete=models.RESTRICT)
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, null=True, default=None, blank=True
     )

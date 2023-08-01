@@ -6,11 +6,15 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+jwt_urlpatterns = [
+    path("", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("verify/", TokenVerifyView.as_view(), name="token_verify"),
+]
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/token/", TokenObtainPairView.as_view()),
-    path("api/token/refresh/", TokenRefreshView.as_view()),
-    path("api/token/verify/", TokenVerifyView.as_view()),
+    path("api/token/", include(jwt_urlpatterns)),
     path("auth/", include("customer.urls")),
     path("api/", include("dealership.urls")),
     path("api/", include("dealer.urls")),
