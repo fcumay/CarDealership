@@ -1,0 +1,22 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      - CarDealership/.env
+    ports:
+      - 5432:5432
+  web:
+    build: .
+    env_file:
+      - CarDealership/.env
+    environment:
+    - PIPENV_SHELL=bash
+    command: sh -c "sleep 10 && pipenv run python CarDealership/manage.py runserver 0.0.0.0:8080"
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
