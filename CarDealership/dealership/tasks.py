@@ -15,11 +15,8 @@ class DealershipManager():
 
     def get_dealers(self):
         current_time = datetime.now()
-        print(f'\n*** Start get_dealers***\n')
-        print(f'\n***current_time - {current_time}***\n')
 
         dealership_brands = Dealership.objects.values('brand')
-        print(f'\n*** Dealership brands{dealership_brands}***\n')
         popular_models = BuyingHistoryCustomer.objects.select_related('car').values('car__model',
                                                                                     'car__model__brand').annotate(
             model_count=Count('car__model')).order_by('-model_count')
@@ -59,10 +56,8 @@ class DealershipManager():
                 unique_models[model] = item
 
         self.dealers_inventory = list(unique_models.values())
-        print(f'\n*** dealers_inventory: {self.dealers_inventory}***\n')
 
     def buy_car(self):
-        print(f'\n***Ibuy_car: {self.dealers_inventory}***\n')
         car_number = Car.objects.count()
         dealerships = Dealership.objects.all()
         cars_to_create = []
@@ -70,7 +65,6 @@ class DealershipManager():
         for dealership in dealerships:
             targets = [item for item in self.dealers_inventory if item["model__brand__name"] == dealership.brand.name]
             balance = dealership.balance
-            print(f'\n***targets: {targets}***\n')
             for target in targets:
                 if balance != 0 and target["discounted_price"] <= balance:
                     car_number += 1
@@ -80,7 +74,6 @@ class DealershipManager():
                         dealership=dealership,
                         price=target["discounted_price"] + 10
                     )
-                    print(f'\n***Create car: {car}***\n')
                     cars_to_create.append(car)
                     history = BuyingHistoryDealer(
                         dealership=dealership,
@@ -88,7 +81,6 @@ class DealershipManager():
                         car=car,
                         price=target['discounted_price']
                     )
-                    print(f'\n***Create history: {history}***\n')
                     histories_to_create.append(history)
                     balance -= target['discounted_price']
             dealership.balance = balance
@@ -117,7 +109,6 @@ def do_offer(user, data):
     car = Car.objects.select_related('dealership').filter(model__name=data['model'], is_active=True,
                                                           price__lte=data['price']).order_by(
         'price').first()
-    print(f'\n***Car: {car}***\n')
     price = car.price * (1 - car.dealership.discount_program / 100)
     if customer.balance >= price:
         BuyingHistoryCustomer.objects.create(
