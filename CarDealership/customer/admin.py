@@ -5,14 +5,18 @@ from .models import Customer, BuyingHistoryCustomer
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     list_display = (
+        "id",
         "email",
         "name",
         "role",
         "balance",
         "location",
         "contact_number",
-        "age",
+        "dob",
     )
+
+    def get_location_display(self, obj):
+        return str(obj.location)
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:

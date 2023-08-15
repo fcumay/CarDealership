@@ -2,6 +2,7 @@ from django.db import models
 
 from customer.models import Customer
 from django_countries.fields import CountryField
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class DrivetrainChoices(models.TextChoices):
@@ -34,8 +35,8 @@ class BodyTypeChoices(models.TextChoices):
 
 
 class TransmissionChoices(models.TextChoices):
-    AUTOMATIC = "automatic", "Automatic"
-    MANUAL = "manual", "Manual"
+    AUTOMATIC = "Automatic", "Automatic"
+    MANUAL = "Manual", "Manual"
     CVT = "CVT", "CVT"
 
 
@@ -44,7 +45,7 @@ class Brand(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
@@ -55,12 +56,13 @@ class Dealership(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=100)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    balance = models.PositiveIntegerField(default=0)
+    name = models.CharField(max_length=100, unique=True)
+    brand = models.ForeignKey(Brand, on_delete=models.RESTRICT)
+    balance = models.PositiveIntegerField(default=100)
     location = CountryField(max_length=15)
-    contact_number = models.CharField(max_length=200)
+    contact_number = PhoneNumberField()
     discount_program = models.IntegerField()
+    owner = models.ForeignKey(Customer, on_delete=models.RESTRICT)
 
     def __str__(self):
         return self.name
@@ -71,8 +73,8 @@ class Model(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=100)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, unique=True)
+    brand = models.ForeignKey(Brand, on_delete=models.RESTRICT)
     drivetrain = models.CharField(
         max_length=20, choices=DrivetrainChoices.choices, default=DrivetrainChoices.FWD
     )
@@ -94,11 +96,11 @@ class Model(models.Model):
 
 class Car(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    model = models.ForeignKey(Model, on_delete=models.CASCADE)
+    model = models.ForeignKey(Model, on_delete=models.RESTRICT)
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, null=True, default=None, blank=True
     )

@@ -5,6 +5,7 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django_countries.fields import CountryField
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class RoleChoices(models.TextChoices):
@@ -15,14 +16,13 @@ class RoleChoices(models.TextChoices):
 
 class UserAccountManager(BaseUserManager):
     def create_customer(
-        self,
-        email,
-        name,
-        balance=None,
-        location=None,
-        contact_number=None,
-        age=None,
-        password=None,
+            self,
+            email,
+            name,
+            location=None,
+            contact_number=None,
+            dob=None,
+            password=None,
     ):
         user = self.model(
             email=email,
@@ -31,7 +31,7 @@ class UserAccountManager(BaseUserManager):
             balance=15,
             location=location,
             contact_number=contact_number,
-            age=age,
+            dob=dob,
         )
         user.set_password(password)
         user.save()
@@ -71,10 +71,9 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     balance = models.PositiveIntegerField(default=0, null=True, blank=True)
-    location = CountryField(null=True, blank=True)
-    contact_number = models.CharField(max_length=20, null=True, blank=True)
-    age = models.IntegerField(null=True, blank=True)
-
+    location = CountryField(max_length=15, null=True, blank=True)
+    contact_number = PhoneNumberField(null=True, blank=True)
+    dob = models.DateField(max_length=8, null=True, blank=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 
@@ -87,11 +86,11 @@ class Customer(AbstractBaseUser, PermissionsMixin):
 class BuyingHistoryCustomer(models.Model):
     id = models.AutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.RESTRICT)
     dealership = models.ForeignKey(
         "dealership.Dealership",
         on_delete=models.CASCADE)
-    car = models.ForeignKey("dealership.Car", on_delete=models.CASCADE)
+    car = models.ForeignKey("dealership.Car", on_delete=models.RESTRICT)
     price = models.PositiveIntegerField()
 
     def __str__(self):
