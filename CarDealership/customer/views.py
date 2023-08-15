@@ -24,9 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (RegistrationPermission,)
 
     def get_queryset(self):
-        queryset = User.objects.all()
-        queryset = queryset.order_by("-id")
-        return queryset
+        return User.objects.all().order_by("-id")
 
     def perform_create(self, serializer):
         if (
@@ -44,9 +42,7 @@ class InformationViewSet(viewsets.ModelViewSet):
     permission_classes = (Information,)
 
     def get_queryset(self):
-        queryset = Customer.objects.all()
-        queryset = queryset.order_by("-id")
-        return queryset
+        return Customer.objects.all().order_by("-id")
 
 
 class BuyingHistoryCustomerViewSet(viewsets.ModelViewSet):
@@ -59,7 +55,5 @@ class BuyingHistoryCustomerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = BuyingHistoryCustomer.objects.all()
-        queryset = queryset.filter(
+        return BuyingHistoryCustomer.objects.filter(
             customer=self.request.user).order_by("-created_at")
-        return queryset

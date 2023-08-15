@@ -36,7 +36,7 @@ class DealerViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Dealer.objects.all()
         if not self.request.user.is_superuser:
-            queryset = queryset.filter(is_active=True).order_by("-created_at")
+            return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
@@ -53,7 +53,7 @@ class DealerInventoryViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = DealerInventory.objects.all()
         if not self.request.user.is_superuser:
-            queryset = queryset.filter(is_active=True).order_by("-created_at")
+            return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
@@ -68,9 +68,7 @@ class BuyingHistoryDealerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = BuyingHistoryDealer.objects.all()
-        queryset = queryset.order_by("-created_at")
-        return queryset
+        return BuyingHistoryDealer.objects.all().order_by("-created_at")
 
 
 class PromotionDealershipViewSet(viewsets.ModelViewSet):
@@ -84,9 +82,7 @@ class PromotionDealershipViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = PromotionDealership.objects.all()
-        queryset = queryset.order_by("-id")
-        return queryset
+        return PromotionDealership.objects.all().order_by("-id")
 
 
 class PromotionDealerViewSet(viewsets.ModelViewSet):
@@ -100,6 +96,4 @@ class PromotionDealerViewSet(viewsets.ModelViewSet):
         instance.save()
 
     def get_queryset(self):
-        queryset = PromotionDealer.objects.all()
-        queryset = queryset.order_by("-id")
-        return queryset
+        return PromotionDealer.objects.all().order_by("-id")

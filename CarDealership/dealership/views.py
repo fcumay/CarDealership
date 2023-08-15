@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+
 from .filters import DealershipFilter, BrandFilter, ModelFilter, CarFilter
 from .models import Model, Brand, Car, Dealership
 from .serializers import (
@@ -9,6 +11,8 @@ from .serializers import (
 )
 from .permissions import CanModifyDealership, IsAdminOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
+from dealership import tasks
+from django.http import JsonResponse
 
 
 class DealershipViewSet(viewsets.ModelViewSet):
@@ -24,7 +28,7 @@ class DealershipViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Dealership.objects.all()
         if not self.request.user.is_superuser:
-            queryset = queryset.filter(is_active=True).order_by("-created_at")
+            return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
@@ -41,7 +45,7 @@ class BrandViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Brand.objects.all()
         if not self.request.user.is_superuser:
-            queryset = queryset.filter(is_active=True).order_by("-created_at")
+            return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
@@ -58,7 +62,7 @@ class ModelViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Model.objects.all()
         if not self.request.user.is_superuser:
-            queryset = queryset.filter(is_active=True).order_by("-created_at")
+            return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
 
@@ -75,8 +79,18 @@ class CarViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Car.objects.all()
         if not self.request.user.is_superuser:
-            queryset = (
-                queryset.filter(customer=None)
-                .exclude(is_active=False).order_by("-created_at")
-            )
+            return queryset.filter(customer=None).exclude(
+                is_active=False).order_by("-created_at")
         return queryset
+
+
+class OfferViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request):
+        if request.method == 'POST':
+            user = request.user.id
+            data = request.data.copy()
+            tasks.do_offer.delay(user, data)
+            return JsonResponse({'message': 'Offer task has been scheduled'})
+        return JsonResponse({'message': 'Only POST requests are allowed'})

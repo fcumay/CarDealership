@@ -1,10 +1,8 @@
-from django_countries import countries
 from django.contrib.auth import get_user_model
 from django_countries.serializers import CountryFieldMixin
 from customer.models import Customer, BuyingHistoryCustomer
 from rest_framework import serializers
 from dealership.models import Dealership, Car
-from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -50,8 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
-    location = serializers.CharField(source="get_location_display")
-
     class Meta:
         model = Customer
         fields = (
@@ -63,46 +59,18 @@ class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
             "contact_number",
             "dob")
 
-    def to_internal_value(self, data):
-        modified_data = self.modify_data(data)
-        return super().to_internal_value(modified_data)
-
-    def modify_data(self, data):
-        modified_data = data.copy()
-        location = modified_data.get("location")
-        if location:
-            for code, name in countries:
-                if name == location:
-                    location = code
-            modified_data["location"] = location
-        return modified_data
-
     def update(self, instance, validated_data):
         validated_data.pop('email', self.instance.email)
         return super().update(instance, validated_data)
 
 
 class BuyingHistoryCustomerSerializer(serializers.ModelSerializer):
+    customer = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all())
+    dealership = serializers.PrimaryKeyRelatedField(
+        queryset=Dealership.objects.all())
+    car = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())
+
     class Meta:
         model = BuyingHistoryCustomer
         fields = ("id", "created_at", "customer", "dealership", "car", "price")
-
-    def to_internal_value(self, data):
-        modified_data = self.modify_data(data)
-        return super().to_internal_value(modified_data)
-
-    def modify_data(self, data):
-        modified_data = data.copy()
-        customer = modified_data.get("customer")
-        dealership = modified_data.get("dealership")
-        car = modified_data.get("car")
-        if customer:
-            customer = get_object_or_404(Customer, name=customer)
-            modified_data["customer"] = customer.id
-        if dealership:
-            dealership = get_object_or_404(Dealership, name=dealership)
-            modified_data["dealership"] = dealership.id
-        if car:
-            car = get_object_or_404(Car, name=car)
-            modified_data["car"] = car.id
-        return modified_data
