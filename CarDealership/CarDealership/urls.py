@@ -1,5 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
+from .yasg import urlpatterns as doc_urls
+from django.conf import settings
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -19,3 +21,13 @@ urlpatterns = [
     path("api/", include("dealership.urls")),
     path("api/", include("dealer.urls")),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+        # ...
+    ] + urlpatterns
+
+
+urlpatterns+=doc_urls

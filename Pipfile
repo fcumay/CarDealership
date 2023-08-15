@@ -14,6 +14,13 @@ autopep8 = "*"
 djangorestframework-simplejwt = "*"
 django-filter = "*"
 django-phonenumber-field = {extras = ["phonenumberslite"], version = "*"}
+celery = "*"
+redis = "*"
+kombu = "*"
+psycopg2-binary = "*"
+drf-yasg = "*"
+django-rest-swagger = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 

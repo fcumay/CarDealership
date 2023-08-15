@@ -32,8 +32,10 @@ INSTALLED_APPS = [
     "dealer",
     "dealership",
     "customer",
+    'debug_toolbar',
     "django_filters",
     "phonenumber_field",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
@@ -44,6 +46,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "CarDealership.urls"
@@ -140,3 +143,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 AUTH_USER_MODEL = "customer.Customer"
+
+#REDIS related settings
+REDIS_HOST='cardealer_redis_1'
+REDIS_PORT='6379'
+CELERY_BROKER_URL='redis://'+REDIS_HOST+':'+REDIS_PORT+'/0'
+CELERY_BROKER_TRANSPORT_OPTIONS={'visibility_timeout':3600}
+CELERY_RESULT_BACKEND = 'redis://'+REDIS_HOST+':'+REDIS_PORT+'/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER='json'
+CELERY_RESULT_SERIALIZER='json'
+CELERY_BEAT_SCHEDULE_FILENAME = ''  # Пустая строка указывает использование Redis в качестве бэкенда
+CELERY_BEAT_SCHEDULER = 'celery.beat.PersistentScheduler'  # Используем персистентный планировщик
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+}
+

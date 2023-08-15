@@ -1,6 +1,6 @@
 from django_filters import rest_framework as filters
 
-from dealer.models import Dealer, DealerInventory, BuyingHistoryDealer
+from dealer.models import Dealer, DealerInventory, BuyingHistoryDealer, PromotionDealership, PromotionDealer
 
 
 class CharFilterInFilter(filters.BaseInFilter, filters.CharFilter):
@@ -49,7 +49,7 @@ class PromotionDealershipFilter(filters.FilterSet):
     model = CharFilterInFilter(field_name="model__name", lookup_expr="in")
 
     class Meta:
-        model = Dealer
+        model = PromotionDealership
         fields = ["name", "dealership", "model"]
 
 
@@ -59,5 +59,5 @@ class PromotionDealerFilter(filters.FilterSet):
     model = CharFilterInFilter(field_name="model__name", lookup_expr="in")
 
     class Meta:
-        model = Dealer
+        model = PromotionDealer
         fields = ["name", "dealer", "model"]
