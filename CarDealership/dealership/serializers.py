@@ -88,3 +88,8 @@ class CarSerializer(serializers.ModelSerializer):
         instance.dealership = None
         instance.save()
         return instance
+
+
+class OfferSerializer(serializers.Serializer):
+    model = serializers.CharField()
+    price = serializers.IntegerField()

@@ -145,10 +145,18 @@ CELERY_BEAT_SCHEDULER = 'celery.beat.PersistentScheduler'
 #     '127.0.0.1',
 # ]
 SWAGGER_SETTINGS = {
+    'SHOW_REQUEST_HEADERS': True,
     "USE_SESSION_AUTH": False,
     "JSON_EDITOR": True,
     "VALIDATOR_URL": None,
     "DEFAULT_API_URL": "http://localhost:8001",
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
 }
 
 DEBUG_TOOLBAR_CONFIG = {

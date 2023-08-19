@@ -133,16 +133,23 @@ def do_offer(user, data):
             output_field=DecimalField()
         )
     ).order_by('final_price').first()
-    if customer.balance >= car.discounted_price:
+    print(f'\n***Car {car}**\n')
+    print(f'\n***Car price {car.final_price}**\n')
+    print(f'\n***Balance {car.dealership.balance}**\n')
+    if customer.balance >= car.final_price and data["price"]>=car.final_price:
+        car.dealership.balance += car.final_price
+        car.dealership.save()
         BuyingHistoryCustomer.objects.create(
             customer=customer,
             dealership=car.dealership,
             car=car,
-            price=car.discounted_price
+            price=car.final_price
         )
+        print(f'\n***Balance2 {car.dealership.balance}**\n')
         car.dealership = None
         car.customer = customer
         car.is_active = False
         car.save()
-        customer.balance -= car.discounted_price
+        customer.balance -= car.final_price
         customer.save()
+        print(f'\n***Customer balance {customer.balance} **\n')

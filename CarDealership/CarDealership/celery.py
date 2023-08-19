@@ -11,10 +11,10 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'buy_car': {
         'task': 'dealership.tasks.buy_car',
-        'schedule': crontab(minute='*/10'),
+        'schedule': crontab(minute='*/30'),
     },
     'get_dealers': {
         'task': 'dealership.tasks.get_dealers',
-        'schedule': crontab(minute='*/20'),
+        'schedule': crontab(minute='*/59'),
     },
 }

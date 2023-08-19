@@ -7,13 +7,14 @@ from .serializers import (
     DealershipSerializer,
     BrandSerializer,
     ModelSerializer,
-    CarSerializer,
+    CarSerializer, OfferSerializer,
 )
 from .permissions import CanModifyDealership, IsAdminOrReadOnly, EmailConfirmPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from dealership import tasks
 from django.http import JsonResponse
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 
 
 class DealershipViewSet(viewsets.ModelViewSet):
@@ -93,7 +94,9 @@ class CarViewSet(viewsets.ModelViewSet):
 
 class OfferViewSet(viewsets.ViewSet):
     permission_classes = [EmailConfirmPermission]
+    serializer_class = OfferSerializer
 
+    @swagger_auto_schema(request_body=OfferSerializer)
     def create(self, request):
         if request.method == 'POST':
             user = request.user.id
