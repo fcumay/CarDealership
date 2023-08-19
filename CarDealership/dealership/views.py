@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.decorators import action
+from dealership import services
 from .filters import DealershipFilter, BrandFilter, ModelFilter, CarFilter
 from .models import Model, Brand, Car, Dealership
 from .serializers import (
@@ -9,10 +9,11 @@ from .serializers import (
     ModelSerializer,
     CarSerializer,
 )
-from .permissions import CanModifyDealership, IsAdminOrReadOnly
+from .permissions import CanModifyDealership, IsAdminOrReadOnly, EmailConfirmPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from dealership import tasks
 from django.http import JsonResponse
+from rest_framework.response import Response
 
 
 class DealershipViewSet(viewsets.ModelViewSet):
@@ -30,6 +31,12 @@ class DealershipViewSet(viewsets.ModelViewSet):
         if not self.request.user.is_superuser:
             return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
+
+    @action(detail=False, methods=["GET"])
+    def get_statistics(self, request):
+        name = request.data.get("name")
+        dealership = services.get_dealership(name)
+        return Response(services.get_statistic(dealership))
 
 
 class BrandViewSet(viewsets.ModelViewSet):
@@ -85,7 +92,7 @@ class CarViewSet(viewsets.ModelViewSet):
 
 
 class OfferViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [EmailConfirmPermission]
 
     def create(self, request):
         if request.method == 'POST':

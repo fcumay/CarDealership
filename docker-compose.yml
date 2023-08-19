@@ -53,3 +53,15 @@ services:
       - celery
       - db
       - redis
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./static:/static
+      - ./nginx/:/etc/nginx/
+    ports:
+      - "8001:80"
+    depends_on:
+      - web
+
+

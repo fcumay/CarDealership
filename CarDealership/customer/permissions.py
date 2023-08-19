@@ -5,7 +5,7 @@ from customer.models import RoleChoices
 
 class RegistrationPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.method == "POST"
+        return request.method == "POST" or request.method == "GET"
 
 
 class Information(permissions.BasePermission):

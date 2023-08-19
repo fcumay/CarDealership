@@ -6,8 +6,8 @@ from customer.models import RoleChoices
 class CanModifyDealership(permissions.BasePermission):
     def has_permission(self, request, view):
         if (
-            request.method == "POST"
-            and request.user.role == RoleChoices.is_dealership_admin
+                request.method == "POST"
+                and request.user.role == RoleChoices.is_dealership_admin
         ):
             return False
         if request.method in permissions.SAFE_METHODS:
@@ -31,3 +31,8 @@ class IsAdminOrReadOnly(permissions.BasePermission):
             return True
         else:
             return request.user.is_staff
+
+
+class EmailConfirmPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.email_verified is True

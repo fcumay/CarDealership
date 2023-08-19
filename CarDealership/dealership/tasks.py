@@ -1,11 +1,12 @@
 from .models import Dealership, Car
 from celery import shared_task
-from dealer.models import DealerInventory, PromotionDealer, BuyingHistoryDealer
+from dealer.models import DealerInventory, PromotionDealer, BuyingHistoryDealer, PromotionDealership
 from customer.models import BuyingHistoryCustomer, Customer
 from CarDealership.celery import app
-from django.db.models import Count, Subquery, OuterRef, F, Case, When, Value, DecimalField, IntegerField
+from django.db.models import Count, DecimalField, IntegerField
 from django.db import transaction
 from datetime import datetime
+from django.db.models import Subquery, OuterRef, Case, When, F, Value, Min
 
 
 class DealershipManager():
@@ -43,8 +44,10 @@ class DealershipManager():
             )
         ).annotate(
             discounted_price=Case(
-                When(promotion_percentage__isnull=False, then=F('price') * (1 - F('promotion_percentage') / 100.0)),
-                default=F('price') * (1 - F('dealer__discount_program') / 100.0),
+                When(promotion_percentage__isnull=False, then=F(
+                    'price') * (1 - F('promotion_percentage') / 100.0)),
+                default=F('price') *
+                (1 - F('dealer__discount_program') / 100.0),
                 output_field=DecimalField()
             )
         ).order_by('model_rank', 'discounted_price').values('dealer', 'model', 'discounted_price', 'model__brand__name')
@@ -63,13 +66,14 @@ class DealershipManager():
         cars_to_create = []
         histories_to_create = []
         for dealership in dealerships:
-            targets = [item for item in self.dealers_inventory if item["model__brand__name"] == dealership.brand.name]
+            targets = [
+                item for item in self.dealers_inventory if item["model__brand__name"] == dealership.brand.name]
             balance = dealership.balance
             for target in targets:
                 if balance != 0 and target["discounted_price"] <= balance:
                     car_number += 1
                     car = Car(
-                        name=f"{dealership.brand.name}_{car_number}",
+                        name=f"{dealership.brand.name}_{str(target['model'])}_{car_number}",
                         model_id=target["model"],
                         dealership=dealership,
                         price=target["discounted_price"] + 10
@@ -83,6 +87,7 @@ class DealershipManager():
                     )
                     histories_to_create.append(history)
                     balance -= target['discounted_price']
+
             dealership.balance = balance
             dealership.save()
         with transaction.atomic():
@@ -106,21 +111,38 @@ def get_dealers():
 @app.task()
 def do_offer(user, data):
     customer = Customer.objects.get(id=user)
-    car = Car.objects.select_related('dealership').filter(model__name=data['model'], is_active=True,
-                                                          price__lte=data['price']).order_by(
-        'price').first()
-    price = car.price * (1 - car.dealership.discount_program / 100)
-    if customer.balance >= price:
+    car = Car.objects.filter(is_active=True, model__name=data['model']).annotate(
+        discounted_price=Case(
+            When(dealership__discount_program__isnull=False,
+                 then=F('price') * (1 - F('dealership__discount_program') / 100.0)),
+            default=F('price'),
+            output_field=DecimalField()
+        )
+    ).annotate(
+        promotion_discount=Subquery(
+            PromotionDealership.objects.filter(
+                dealership=OuterRef('dealership'),
+                model=OuterRef('model'),
+            ).values('percentage')[:1]
+        )
+    ).annotate(
+        final_price=Case(
+            When(promotion_discount__isnull=False, then=F(
+                'discounted_price') * (1 - F('promotion_discount') / 100.0)),
+            default=F('discounted_price'),
+            output_field=DecimalField()
+        )
+    ).order_by('final_price').first()
+    if customer.balance >= car.discounted_price:
         BuyingHistoryCustomer.objects.create(
             customer=customer,
             dealership=car.dealership,
             car=car,
-            price=price
+            price=car.discounted_price
         )
         car.dealership = None
         car.customer = customer
         car.is_active = False
         car.save()
-        customer.balance -= price
+        customer.balance -= car.discounted_price
         customer.save()
-    return True

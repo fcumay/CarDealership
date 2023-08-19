@@ -21,6 +21,7 @@ psycopg2-binary = "*"
 drf-yasg = "*"
 django-rest-swagger = "*"
 django-debug-toolbar = "*"
+loguru = "*"
 
 [dev-packages]
 
