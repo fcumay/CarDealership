@@ -18,10 +18,31 @@ class CanModifyDealership(permissions.BasePermission):
         ]
 
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         if request.user.role == RoleChoices.is_superuser:
             return True
-        elif request.user.role == RoleChoices.is_dealership_admin:
+        elif request.user.role == RoleChoices.is_dealership_admin and request.method != "PUT":
             return request.user.email == obj.owner.email
+        return False
+
+
+class CarPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.user.role in [
+                RoleChoices.is_superuser, RoleChoices.is_dealership_admin]:
+            return True
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.role == RoleChoices.is_superuser:
+            return True
+        elif request.user.role == RoleChoices.is_dealership_admin and request.method != "PUT":
+            return request.user.email == obj.dealership.owner.email
         return False
 
 

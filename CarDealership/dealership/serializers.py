@@ -5,8 +5,10 @@ from .models import Dealership
 
 
 class DealershipSerializer(serializers.ModelSerializer):
-    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all())
-    owner = serializers.PrimaryKeyRelatedField(queryset=Customer.objects.all())
+    brand = serializers.PrimaryKeyRelatedField(
+        queryset=Brand.objects.filter(is_active=True))
+    owner = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.filter(is_active=True))
 
     class Meta:
         model = Dealership
@@ -31,6 +33,24 @@ class DealershipSerializer(serializers.ModelSerializer):
             data.pop("owner", None)
         return data
 
+    def update(self, instance, validated_data):
+        request = self.context.get("request", None)
+        if not request.user.is_superuser:
+            if "owner" in validated_data:
+                validated_data.pop("owner")
+            if "balance" in validated_data:
+                validated_data.pop("balance")
+        return super().update(instance, validated_data)
+
+    def partial_update(self, instance, validated_data):
+        request = self.context.get("request", None)
+        if not request.user.is_superuser:
+            if "owner" in validated_data:
+                validated_data.pop("owner")
+            if "balance" in validated_data:
+                validated_data.pop("balance")
+        return super().partial_update(instance, validated_data)
+
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,7 +62,8 @@ class BrandSerializer(serializers.ModelSerializer):
 
 
 class ModelSerializer(serializers.ModelSerializer):
-    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all())
+    brand = serializers.PrimaryKeyRelatedField(
+        queryset=Brand.objects.filter(is_active=True))
 
     class Meta:
         model = Model
@@ -58,36 +79,27 @@ class ModelSerializer(serializers.ModelSerializer):
 
 
 class CarSerializer(serializers.ModelSerializer):
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
-    customer = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all(), allow_null=True)
+    model = serializers.PrimaryKeyRelatedField(
+        queryset=Model.objects.filter(is_active=True))
     dealership = serializers.PrimaryKeyRelatedField(
-        queryset=Dealership.objects.all())
+        queryset=Dealership.objects.filter(is_active=True))
 
     class Meta:
         model = Car
-        fields = ("id", "name", "model", "customer", "dealership", "price")
-
-    def create(self, validated_data):
-        name = validated_data.get('name')
-        model = validated_data.get('model')
-        dealership = validated_data.get('dealership')
-        price = validated_data.get('price')
-        car = Car(
-            name=name,
-            model=model,
-            dealership=dealership,
-            price=price,
-            customer=None)
-        car.save()
-        return car
+        fields = ("id", "name", "model", "dealership", "price")
 
     def update(self, instance, validated_data):
-        customer = validated_data.get('customer')
-        instance.customer = customer
-        instance.dealership = None
-        instance.save()
-        return instance
+        request = self.context.get("request", None)
+        if not request.user.is_superuser:
+            if "name" in validated_data:
+                validated_data.pop("name")
+            if "model" in validated_data:
+                validated_data.pop("model")
+            if "customer" in validated_data:
+                validated_data.pop("customer")
+            if "dealership" in validated_data:
+                validated_data.pop("dealership")
+        return super().update(instance, validated_data)
 
 
 class OfferSerializer(serializers.Serializer):

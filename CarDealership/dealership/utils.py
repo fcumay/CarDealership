@@ -1,11 +1,9 @@
-from customer.models import BuyingHistoryCustomer
 from dealership.models import Dealership
-from django.db.models import Sum
 from django.db.models import Sum, Count
 
 
-def get_dealership(name):
-    return Dealership.objects.get(name=name)
+def get_dealership(id):
+    return Dealership.objects.get(id=id)
 
 
 def get_statistic(dealership):
@@ -18,7 +16,7 @@ def get_statistic(dealership):
     ).get(name=dealership.name)
 
     return {
-        'Cars': dealership_with_stats.car_sales,
-        'Totally profit': dealership_with_stats.total_profit or 0,
-        'Number unique': dealership_with_stats.unique_customers
+        'cars': dealership_with_stats.car_sales,
+        'totally_profit': dealership_with_stats.total_profit,
+        'number_unique': dealership_with_stats.unique_customers
     }

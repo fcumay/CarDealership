@@ -17,7 +17,7 @@ def generate_verification_token():
 
 
 def send_email_link(token, user):
-    verification_link = f"http://127.0.0.1:8080/auth/verify-email/?token={token}"
+    verification_link = f"http://localhost:8001/auth/user/verify_email/?token={token}"
     send_mail(
         "Email Verification",
         f"Please verify your email by clicking this link: {verification_link}",
@@ -25,6 +25,7 @@ def send_email_link(token, user):
         [user.email],
         fail_silently=False,
     )
+    return True
 
 
 def send_password_reset_link(user, email):
@@ -39,15 +40,15 @@ def send_password_reset_link(user, email):
 
     send_mail(
         "Password Reset",
-        f"Use the following link to reset your password: http://127.0.0.1:8080/{reset_url}",
+        f"Use the following link to reset your password: http://localhost:8001/{reset_url}",
         "voyshnismaya@gmail.com",
         [email],
         fail_silently=False,
     )
 
 
-def get_customer(email):
-    return Customer.objects.get(email=email)
+def get_customer(id):
+    return Customer.objects.get(id=id)
 
 
 def get_statistic(customer):
@@ -57,9 +58,9 @@ def get_statistic(customer):
         buying_history_prefetch).get(email=customer.email)
 
     total_spent = customer_with_history.buyinghistorycustomer_set.aggregate(total_spent=Sum('price'))[
-        'total_spent'] or 0
+        'total_spent']
 
     cars = [
         entry.car.name for entry in customer_with_history.buyinghistorycustomer_set.all()]
 
-    return {'Cars': cars, 'Totally spend': total_spent}
+    return {'cars': cars, 'totally_spend': total_spent}

@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from dealership import services
+from customer.views import DeactivationMixin
+from dealership import utils
 from .filters import DealershipFilter, BrandFilter, ModelFilter, CarFilter
 from .models import Model, Brand, Car, Dealership
 from .serializers import (
@@ -9,7 +10,7 @@ from .serializers import (
     ModelSerializer,
     CarSerializer, OfferSerializer,
 )
-from .permissions import CanModifyDealership, IsAdminOrReadOnly, EmailConfirmPermission
+from .permissions import CanModifyDealership, IsAdminOrReadOnly, EmailConfirmPermission, CarPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from dealership import tasks
 from django.http import JsonResponse
@@ -17,15 +18,11 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
 
-class DealershipViewSet(viewsets.ModelViewSet):
+class DealershipViewSet(DeactivationMixin, viewsets.ModelViewSet):
     serializer_class = DealershipSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = DealershipFilter
     permission_classes = [CanModifyDealership]
-
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
 
     def get_queryset(self):
         queryset = Dealership.objects.all()
@@ -33,22 +30,17 @@ class DealershipViewSet(viewsets.ModelViewSet):
             return queryset.filter(is_active=True).order_by("-created_at")
         return queryset
 
-    @action(detail=False, methods=["GET"])
-    def get_statistics(self, request):
-        name = request.data.get("name")
-        dealership = services.get_dealership(name)
-        return Response(services.get_statistic(dealership))
+    @action(detail=False, methods=["GET"], url_path="statistic/(?P<id>\\d+)")
+    def get_statistics(self, request, id):
+        dealership = utils.get_dealership(id)
+        return Response(utils.get_statistic(dealership))
 
 
-class BrandViewSet(viewsets.ModelViewSet):
+class BrandViewSet(DeactivationMixin, viewsets.ModelViewSet):
     serializer_class = BrandSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BrandFilter
     permission_classes = [IsAdminOrReadOnly]
-
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
 
     def get_queryset(self):
         queryset = Brand.objects.all()
@@ -57,15 +49,11 @@ class BrandViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class ModelViewSet(viewsets.ModelViewSet):
+class ModelViewSet(DeactivationMixin, viewsets.ModelViewSet):
     serializer_class = ModelSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = ModelFilter
     permission_classes = [IsAdminOrReadOnly]
-
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
 
     def get_queryset(self):
         queryset = Model.objects.all()
@@ -74,15 +62,11 @@ class ModelViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class CarViewSet(viewsets.ModelViewSet):
+class CarViewSet(DeactivationMixin, viewsets.ModelViewSet):
     serializer_class = CarSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = CarFilter
-    permission_classes = [IsAdminOrReadOnly]
-
-    def perform_destroy(self, instance):
-        instance.is_active = False
-        instance.save()
+    permission_classes = [CarPermission]
 
     def get_queryset(self):
         queryset = Car.objects.all()

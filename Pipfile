@@ -22,6 +22,8 @@ drf-yasg = "*"
 django-rest-swagger = "*"
 django-debug-toolbar = "*"
 loguru = "*"
+pytest = "*"
+pytest-django = "*"
 
 [dev-packages]
 

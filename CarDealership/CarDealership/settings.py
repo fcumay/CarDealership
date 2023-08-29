@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
@@ -33,7 +34,6 @@ INSTALLED_APPS = [
     "dealer",
     "dealership",
     "customer",
-    'debug_toolbar',
     "django_filters",
     "phonenumber_field",
     "drf_yasg",
@@ -47,7 +47,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "CarDealership.urls"
@@ -141,9 +140,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE_FILENAME = ''
 CELERY_BEAT_SCHEDULER = 'celery.beat.PersistentScheduler'
 
-# INTERNAL_IPS = [
-#     '127.0.0.1',
-# ]
 SWAGGER_SETTINGS = {
     'SHOW_REQUEST_HEADERS': True,
     "USE_SESSION_AUTH": False,
@@ -159,9 +155,11 @@ SWAGGER_SETTINGS = {
     },
 }
 
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
-}
+if 'test' in sys.argv:
+    MIDDLEWARE = [
+        middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
+    INSTALLED_APPS = [
+        app for app in INSTALLED_APPS if 'debug_toolbar' not in app]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

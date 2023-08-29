@@ -25,8 +25,10 @@ class DealerSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
 
 class DealerInventorySerializer(serializers.ModelSerializer):
-    dealer = serializers.PrimaryKeyRelatedField(queryset=Dealer.objects.all())
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
+    dealer = serializers.PrimaryKeyRelatedField(
+        queryset=Dealer.objects.filter(is_active=True))
+    model = serializers.PrimaryKeyRelatedField(
+        queryset=Model.objects.filter(is_active=True))
 
     class Meta:
         model = DealerInventory
@@ -41,8 +43,10 @@ class DealerInventorySerializer(serializers.ModelSerializer):
 class BuyingHistoryDealerSerializer(serializers.ModelSerializer):
     dealership = serializers.PrimaryKeyRelatedField(
         queryset=Dealership.objects.all())
-    dealer = serializers.PrimaryKeyRelatedField(queryset=Dealer.objects.all())
-    car = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())
+    dealer = serializers.PrimaryKeyRelatedField(
+        queryset=Dealer.objects.filter(is_active=True))
+    car = serializers.PrimaryKeyRelatedField(
+        queryset=Car.objects.filter(is_active=True))
 
     class Meta:
         model = BuyingHistoryDealer
@@ -58,7 +62,8 @@ class BuyingHistoryDealerSerializer(serializers.ModelSerializer):
 class PromotionDealershipSerializer(serializers.ModelSerializer):
     dealership = serializers.PrimaryKeyRelatedField(
         queryset=Dealership.objects.all())
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
+    model = serializers.PrimaryKeyRelatedField(
+        queryset=Model.objects.filter(is_active=True))
 
     class Meta:
         model = PromotionDealership
@@ -75,8 +80,10 @@ class PromotionDealershipSerializer(serializers.ModelSerializer):
 
 
 class PromotionDealerSerializer(serializers.ModelSerializer):
-    dealer = serializers.PrimaryKeyRelatedField(queryset=Dealer.objects.all())
-    model = serializers.PrimaryKeyRelatedField(queryset=Model.objects.all())
+    dealer = serializers.PrimaryKeyRelatedField(
+        queryset=Dealer.objects.filter(is_active=True))
+    model = serializers.PrimaryKeyRelatedField(
+        queryset=Model.objects.filter(is_active=True))
 
     class Meta:
         model = PromotionDealer
