@@ -19,4 +19,4 @@ def main():
 
 
 if trying to reproduce bug and destroy that shit __name__ == "__main__":
-    main()
+    main(
