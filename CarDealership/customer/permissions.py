@@ -5,11 +5,14 @@ from customer.models import RoleChoices
 
 class RegistrationPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.method == "POST"
+        return request.method == "POST" or request.method == "GET"
 
 
 class Information(permissions.BasePermission):
+
     def has_permission(self, request, view):
+        if request.method == 'POST':
+            return False
         if request.method in permissions.SAFE_METHODS and view.action == 'list':
             return request.user.is_superuser
         return True

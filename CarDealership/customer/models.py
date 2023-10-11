@@ -15,6 +15,15 @@ class RoleChoices(models.TextChoices):
 
 
 class UserAccountManager(BaseUserManager):
+    def set_email_verification_token(self, user, token):
+        user.email_verification_token = token
+        user.save()
+
+    def verify_email(self, user):
+        user.email_verified = True
+        user.email_verification_token = None
+        user.save()
+
     def create_customer(
             self,
             email,
@@ -61,6 +70,9 @@ class UserAccountManager(BaseUserManager):
 class Customer(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
+    email_verification_token = models.CharField(
+        max_length=100, blank=True, null=True)
+    email_verified = models.BooleanField(default=False)
     name = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
     role = models.CharField(
@@ -74,6 +86,7 @@ class Customer(AbstractBaseUser, PermissionsMixin):
     location = CountryField(max_length=15, null=True, blank=True)
     contact_number = PhoneNumberField(null=True, blank=True)
     dob = models.DateField(max_length=8, null=True, blank=True)
+
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 

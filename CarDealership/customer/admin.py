@@ -13,6 +13,8 @@ class CustomerAdmin(admin.ModelAdmin):
         "location",
         "contact_number",
         "dob",
+        "email_verification_token",
+        "email_verified",
     )
 
     def get_location_display(self, obj):

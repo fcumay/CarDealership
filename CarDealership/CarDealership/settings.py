@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
@@ -17,8 +18,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
-
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['localhost']
+USE_X_FORWARDED_HOST = True
 # Application definition
 
 INSTALLED_APPS = [
@@ -32,7 +34,6 @@ INSTALLED_APPS = [
     "dealer",
     "dealership",
     "customer",
-    'debug_toolbar',
     "django_filters",
     "phonenumber_field",
     "drf_yasg",
@@ -46,7 +47,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
 ROOT_URLCONF = "CarDealership.urls"
@@ -69,9 +69,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "CarDealership.wsgi.application"
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("POSTGRES_ENGINE"),
@@ -82,9 +79,6 @@ DATABASES = {
         "PORT": os.environ.get("POSTGRES_PORT"),
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,9 +95,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -111,9 +102,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
 
@@ -136,31 +124,47 @@ SIMPLE_JWT = {
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 AUTH_USER_MODEL = "customer.Customer"
 
-#REDIS related settings
-REDIS_HOST='cardealer_redis_1'
-REDIS_PORT='6379'
-CELERY_BROKER_URL='redis://'+REDIS_HOST+':'+REDIS_PORT+'/0'
-CELERY_BROKER_TRANSPORT_OPTIONS={'visibility_timeout':3600}
-CELERY_RESULT_BACKEND = 'redis://'+REDIS_HOST+':'+REDIS_PORT+'/0'
+REDIS_HOST = 'cardealer_redis_1'
+REDIS_PORT = '6379'
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER='json'
-CELERY_RESULT_SERIALIZER='json'
-CELERY_BEAT_SCHEDULE_FILENAME = ''  # Пустая строка указывает использование Redis в качестве бэкенда
-CELERY_BEAT_SCHEDULER = 'celery.beat.PersistentScheduler'  # Используем персистентный планировщик
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_BEAT_SCHEDULE_FILENAME = ''
+CELERY_BEAT_SCHEDULER = 'celery.beat.PersistentScheduler'
 
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+SWAGGER_SETTINGS = {
+    'SHOW_REQUEST_HEADERS': True,
+    "USE_SESSION_AUTH": False,
+    "JSON_EDITOR": True,
+    "VALIDATOR_URL": None,
+    "DEFAULT_API_URL": "http://localhost:8001",
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
 }
 
+if 'test' in sys.argv:
+    MIDDLEWARE = [
+        middleware for middleware in MIDDLEWARE if 'debug_toolbar' not in middleware]
+    INSTALLED_APPS = [
+        app for app in INSTALLED_APPS if 'debug_toolbar' not in app]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+CSRF_TRUSTED_ORIGINS = [os.environ.get("TRUSTED_HOST")]

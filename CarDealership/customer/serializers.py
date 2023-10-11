@@ -15,7 +15,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "name", "email", "password", "re_password", "role")
+        fields = (
+            "id", "name", "email", "password", "re_password", "role", "email_verification_token", "email_verified")
         extra_kwargs = {
             "password": {"write_only": True},
             "re_password": {"write_only": True},
@@ -45,6 +46,12 @@ class UserSerializer(serializers.ModelSerializer):
                 name=validated_data["name"],
                 password=validated_data["password"],
             )
+        elif validated_data["role"] == "superuser":
+            return User.objects.create_superuser(
+                email=validated_data["email"].lower(),
+                name=validated_data["name"],
+                password=validated_data["password"],
+            )
 
 
 class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
@@ -66,10 +73,11 @@ class InformationSerializer(CountryFieldMixin, serializers.ModelSerializer):
 
 class BuyingHistoryCustomerSerializer(serializers.ModelSerializer):
     customer = serializers.PrimaryKeyRelatedField(
-        queryset=Customer.objects.all())
+        queryset=Customer.objects.filter(is_active=True))
     dealership = serializers.PrimaryKeyRelatedField(
-        queryset=Dealership.objects.all())
-    car = serializers.PrimaryKeyRelatedField(queryset=Car.objects.all())
+        queryset=Dealership.objects.filter(is_active=True))
+    car = serializers.PrimaryKeyRelatedField(
+        queryset=Car.objects.filter(is_active=True))
 
     class Meta:
         model = BuyingHistoryCustomer
